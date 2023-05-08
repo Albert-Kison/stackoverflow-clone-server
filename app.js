@@ -29,13 +29,19 @@ app.use(cors());
 
 mongoose.connect(
   // process.env.MONGODB_URI,
-  'mongodb://localhost:27017/mydatabase',
+  // 'mongodb://localhost:27017/mydatabase',
+  "mongodb+srv://IvanAdmin:iuytrewq@finalassignment.jkd5oe8.mongodb.net/?retryWrites=true&w=majority",
   {
     useNewUrlParser: true,
     useNewUrlParser:true,
   }
 );
+const db = mongoose.connection;
 
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('Connected to MongoDB Atlas');
+});
 app.use(bodyParser.json());
 
 app.use(requestLogger);
@@ -96,9 +102,9 @@ app.use((err, req, res, next) => {
   next();
 });
 
-// app.listen(process.env.PORT || 8080, () => {
-//   console.log(`App listening on port ${process.env.PORT}`);
-// });
-app.listen(3000, () => {
-  console.log(`App listening on port 3000`);
+app.listen(process.env.PORT || 8080, () => {
+  console.log(`App listening on port ${process.env.PORT}`);
 });
+// app.listen(3000, () => {
+//   console.log(`App listening on port 3000`);
+// });
