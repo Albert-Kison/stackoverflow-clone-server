@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Node.js</title>
+    <link rel="icon" type="image/x-icon" href="./images/cropped-logo-favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>BLOG CUTE DOGS </h1>
+    <nav>
+    <a href="index1.html" class="header_link">signup</a>
+    <a href="login.html" class="header_link">signin</a>
+    <a href="addPost.html" class="header_link admin">addPost</a>
+    <a href="editPost.html" class="header_link admin">editPost</a>
+    <a href="deleteUsers.html" class="header_link admin">deleteUser</a>
+    </nav>
+    <h2>Introduction</h2>
+    <p>Welcome to our website, where we focus solely on dog breeds! Here you'll find an extensive collection of information about different types of dogs, including their history, physical characteristics, and temperament. Our aim is to provide you with a comprehensive resource that can assist you in choosing the perfect dog breed to suit your lifestyle and preferences. Whether you're searching for a small lap dog or a large, active breed, we've got you covered. So, take a look around and discover the amazing diversity of dog breeds!</p>
+    <h2>Posts</h2>
+    <div class="container"></div>
+    <template class="template">
+        <div class="item">
+            <img class="image" src="#" alt="">
+            <p class="post">Hello my name is Ivan</p>
+            <button class="showComments">ShowComments</button>
+            <button class="showDetails">ShowDetails</button>
+            <div class="commentsContainer">
+            <textarea class="commentSpace" name="commentSpace" cols="30" rows="3"></textarea>
+            <button class="addComment">AddComment</button>
+            </div>
+        </div>
+    </template>
+    <div class="popup">
+        <div class="popup_container">
+        <button class="closePopup">X</button>
+        <img class="imagePopup" src="" alt="">
+        <p class="textPopup"></p>
+        </div>
+    </div>
+    <div class="popup_comments">
+        <div class="commentsPopupContainer">
+            <button class="closePopupComments">X</button>
+            <div class="comments_Popup_Container"></div>
+            <textarea class="popupCommentSpace" name="commentSpace" cols="30" rows="3"></textarea>
+            <button class="popupAddComment">AddComment</button>
+        </div>   
+    </div>
+    
+<script  src="homePage.js"></script>
+</body>
+</html>
