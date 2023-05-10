@@ -25,6 +25,7 @@ const questionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
     required: true,
+    select: 'name'
   },
   tags: {
     type: [String],
@@ -45,7 +46,7 @@ const questionSchema = new mongoose.Schema({
     upvotes: { type: Number, default: 0 },
     comments: [{
       text: { type: String, required: true },
-      user: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
+      user: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true,select: 'name'},
       createdAt: { type: Date, default: Date.now() },
       name: { type: String },
     }],
