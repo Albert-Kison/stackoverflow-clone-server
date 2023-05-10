@@ -261,19 +261,43 @@ const deleteQuestion = (req, res, next) => {
     });
 };
 
-const addAnswer = (req, res, next) => {
-  const { text, name } = req.body;
+// const addAnswer = (req, res, next) => {
+//   const { text, name } = req.body;
 
-  if (!text || !name) {
-    return res.status(400).send({ message: 'Text and name are required' });
+//   if (!text || !name) {
+//     return res.status(400).send({ message: 'Text and name are required' });
+//   }
+
+//   const questionId = req.params._id;
+//   const answerId = new ObjectId();
+
+//   Question.findByIdAndUpdate(
+//     questionId,
+//     { $push: { answers: { _id: answerId,text, name, user_name: req.user.name } } },
+//     { new: true }
+//   )
+//     .then((updatedQuestion) => {
+//       res.status(200).send(updatedQuestion);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
+const addAnswer = (req, res, next) => {
+  const { text } = req.body;
+
+  if (!text) {
+    return res.status(400).send({ message: 'Text is required' });
   }
 
   const questionId = req.params._id;
   const answerId = new ObjectId();
 
+  const userName = req.user.name; // retrieve name of authorized user from request object
+
   Question.findByIdAndUpdate(
     questionId,
-    { $push: { answers: { _id: answerId,text, name, user_name: req.user.name } } },
+    { $push: { answers: { _id: answerId, text, name: userName, user_name: userName } } },
     { new: true }
   )
     .then((updatedQuestion) => {
