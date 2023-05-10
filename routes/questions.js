@@ -51,7 +51,7 @@ router.post(
   '/',
   celebrate({
     body: Joi.object().keys({
-      text: Joi.string().required(),
+      text: Joi.string().min(1).max(1000).required(),
     }),
   }),
   searchQuestionByText
