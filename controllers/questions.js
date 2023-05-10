@@ -198,7 +198,7 @@ const createQuestion = (req, res, next) => {
   const { text, tags } = req.body;
   const image = req.file ? req.file.buffer : 'default-image.jpg';
 
-  Question.create({ text, image, tags, owner: req.user._id })
+  Question.create({ text, image, tags, owner: req.user.name })
     .then((question) => res.status(200).send(question))
     .catch((err) => {
       if (err.name === 'ValidationError') {
