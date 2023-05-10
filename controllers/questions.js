@@ -198,7 +198,7 @@ const createQuestion = (req, res, next) => {
   const { text, tags } = req.body;
   const image = req.file ? req.file.buffer : 'default-image.jpg';
 
-  Question.create({ text, image, tags, owner: req.user.name })
+  Question.create({ text, image, tags, owner: req.user._id })
     .then((question) => res.status(200).send(question))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -293,11 +293,9 @@ const addAnswer = (req, res, next) => {
   const questionId = req.params._id;
   const answerId = new ObjectId();
 
-  const userName = req.user.name; // retrieve name of authorized user from request object
-
   Question.findByIdAndUpdate(
     questionId,
-    { $push: { answers: { _id: answerId, text, ownerName: userName } } },
+    { $push: { answers: { _id: answerId, text, ownerName: req.user._id } } },
     { new: true }
   )
     .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name

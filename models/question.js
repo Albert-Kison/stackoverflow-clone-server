@@ -35,7 +35,7 @@ const questionSchema = new mongoose.Schema({
     // name: { type: String, required: true },
     // user_name: { type: String },
     ownerName: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'user',
       required: true,
       select: 'name'
