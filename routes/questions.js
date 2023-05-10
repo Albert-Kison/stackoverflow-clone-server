@@ -47,20 +47,20 @@ router.get(
   getQuestion
 );
 
-router.get(
+router.post(
   '/',
   celebrate({
-    body: Joi.object().keys({
+    query: Joi.object().keys({
       text: Joi.string().required(),
     }),
   }),
   searchQuestionByText
 );
 
-router.get(
+router.post(
   '/tags',
   celebrate({
-    body: Joi.object().keys({
+    query: Joi.object().keys({
       tags: Joi.array().items(Joi.string().required()).min(1).required(),
     }),
   }),
