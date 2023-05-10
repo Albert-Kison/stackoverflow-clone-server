@@ -381,7 +381,7 @@ const upvoteAnswer = (req, res, next) => {
     });
 };
 const addComment = (req, res, next) => {
-  const { text } = req.body;
+  const { text,name } = req.body;
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
 
@@ -391,7 +391,7 @@ const addComment = (req, res, next) => {
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $push: { "answers.$.comments": { text, user: req.user._id } } },
+    { $push: { "answers.$.comments": { text, user: req.user._id,name:req.user.name} } },
     { new: true }
   )
     .then((updatedQuestion) => {

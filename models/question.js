@@ -40,7 +40,8 @@ const questionSchema = new mongoose.Schema({
     comments: [{
       text: { type: String, required: true },
       user: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
-      createdAt: { type: Date, default: Date.now() }
+      createdAt: { type: Date, default: Date.now() },
+      name: { type: String },
     }],
     createdAt: { type: Date, default: Date.now() }
 }],

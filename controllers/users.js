@@ -203,7 +203,7 @@ const login = (req, res, next) => {
         JWT_SECRET,
         { expiresIn: '7d' },
       );
-      res.send({ token, id: user._id, isAdmin: user.isAdmin, name: user.name });
+      res.send({ token, id: user._id, isAdmin: user.isAdmin, name: user.name,isExpert:user.isExpert,tags: user.tags, });
     })
     .catch(next);
 };
