@@ -67,7 +67,7 @@ const getQuestion = (req, res, next) => {
 };
 
 const searchQuestionByText = (req, res, next) => {
-  const searchText = req.query.text;
+  const searchText = req.body.text;
 
   Question.find({ text: { $regex: searchText, $options: 'i' } })
     .populate('owner', 'name email tags isExpert')
@@ -103,7 +103,7 @@ const searchQuestionByText = (req, res, next) => {
 };
 
 const searchQuestionByTags = (req, res, next) => {
-  const tags = req.query.tags;
+  const tags = req.body.tags;
 
   Question.find({ tags: { $all: tags } })
     .populate('owner', 'name email tags isExpert')

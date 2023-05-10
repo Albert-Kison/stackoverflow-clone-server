@@ -50,7 +50,7 @@ router.get(
 router.post(
   '/',
   celebrate({
-    query: Joi.object().keys({
+    body: Joi.object().keys({
       text: Joi.string().required(),
     }),
   }),
@@ -60,7 +60,7 @@ router.post(
 router.post(
   '/tags',
   celebrate({
-    query: Joi.object().keys({
+    body: Joi.object().keys({
       tags: Joi.array().items(Joi.string().required()).min(1).required(),
     }),
   }),
