@@ -199,7 +199,7 @@ const createQuestion = (req, res, next) => {
   const image = req.file ? req.file.buffer : 'default-image.jpg';
 
   Question.create({ text, image, tags, owner: req.user._id })
-    .populate('owner', 'name')
+    // .populate('owner', 'name')
     .then((question) => res.status(200).send(question))
     .catch((err) => {
       if (err.name === 'ValidationError') {
