@@ -297,7 +297,7 @@ const addAnswer = (req, res, next) => {
 
   Question.findByIdAndUpdate(
     questionId,
-    { $push: { answers: { _id: answerId, text, name: userName, user_name: userName } } },
+    { $push: { answers: { _id: answerId, text, name: userName } } },
     { new: true }
   )
     .then((updatedQuestion) => {
