@@ -6,7 +6,7 @@ const questionSchema = new mongoose.Schema({
   text: {
     type: String,
     required: true,
-    minlength: 20,
+    minlength: 1,
     maxlength: 1000,
   },
   // link: {
