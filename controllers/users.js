@@ -126,23 +126,53 @@ const editUser = (req, res, next) => {
     // })
 //     .catch(next);
 // };
+// const login = (req, res, next) => {
+//   const { email, password } = req.body;
+//   User.findOne({ email })
+//     .orFail(() => {
+//       throw new AuthError('Wrong name or password!');
+//     })
+//     .then((user) => {
+//       if(user.email=="aivanzhukov28@gmail.com"){
+//         user.isAdmin =true;
+//         user.save();
+//       }
+//       const token = jwt.sign(
+//         { _id: user._id },
+//         JWT_SECRET,
+//         { expiresIn: '7d' },
+//       );
+//       res.send({ token, id: user._id,isAdmin: user.isAdmin,name:user.name });
+//     })
+//     .catch(next);
+// };
 const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email })
+    .select('+password')
     .orFail(() => {
-      throw new AuthError('Wrong name or password!');
+      throw new AuthError('Wrong email or password!');
     })
     .then((user) => {
-      if(user.email=="aivanzhukov28@gmail.com"){
-        user.isAdmin =true;
-        user.save();
-      }
+      return bcrypt.compare(password, user.password)
+        .then((match) => {
+          if (!match) {
+            throw new AuthError('Wrong email or password!');
+          }
+          if(user.email == "aivanzhukov28@gmail.com"){
+            user.isAdmin = true;
+            return user.save();
+          }
+          return user;
+        });
+    })
+    .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
         JWT_SECRET,
         { expiresIn: '7d' },
       );
-      res.send({ token, id: user._id,isAdmin: user.isAdmin,name:user.name });
+      res.send({ token, id: user._id, isAdmin: user.isAdmin, name: user.name });
     })
     .catch(next);
 };

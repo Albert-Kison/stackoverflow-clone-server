@@ -25,6 +25,7 @@ router.post(
     body: Joi.object().keys({
       link:Joi.string().pattern(sampleUrl).required(),
       text: Joi.string().min(20).max(1000),
+      tags: Joi.array().items(Joi.string()),
     }),
   }),
   createQuestion,
@@ -38,6 +39,7 @@ router.post(
     body: Joi.object().keys({
       link: Joi.string().pattern(sampleUrl).required(),
       text: Joi.string().min(20).max(1000),
+      tags: Joi.array().items(Joi.string()),
     }),
   }),
   editQuestion,

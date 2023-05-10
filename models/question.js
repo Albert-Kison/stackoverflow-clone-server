@@ -22,6 +22,9 @@ const questionSchema = new mongoose.Schema({
     ref: 'user',
     required: true,
   },
+  tags: {
+    type: [String],
+  },
   answers: [{
     _id: { type: mongoose.Schema.Types.ObjectId },
     text: { type: String },

@@ -11,23 +11,34 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
 
+// const createQuestion = (req, res, next) => {
+//   const {link,text} = req.body;
+//   Question.create({link,text, owner: req.user._id })
+//     .then((question) => res.status(200).send(question))
+//     .catch((err) => {
+//       if (err.name === 'ValidationError') {
+//         next(new ValidationError('Wrond data transferred'));
+//       }
+//       next(err);
+//     });
+// };
 const createQuestion = (req, res, next) => {
-  const {link,text} = req.body;
-  Question.create({link,text, owner: req.user._id })
+  const { link, text, tags } = req.body;
+  Question.create({ link, text, tags, owner: req.user._id })
     .then((question) => res.status(200).send(question))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ValidationError('Wrond data transferred'));
+        next(new ValidationError('Wrong data transferred'));
       }
       next(err);
     });
 };
 const editQuestion = (req, res, next) => {
-  const { link,text } = req.body;
+  const { link,text,tags} = req.body;
   const questionId = req.params.id; 
   Question.findByIdAndUpdate(
     questionId,
-    { link,text },
+    { link,text,tags},
     { new: true }
   )
     .then((question) => {
