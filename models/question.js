@@ -32,7 +32,7 @@ const questionSchema = new mongoose.Schema({
   answers: [{
     _id: { type: mongoose.Schema.Types.ObjectId },
     text: { type: String },
-    name: { type: String },
+    name: { type: String, required: true },
     user_name: { type: String },
     approved: { type: Boolean, default: false },
     grade: { type: Number, min: 0, max: 10, default: null },
