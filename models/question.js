@@ -32,8 +32,14 @@ const questionSchema = new mongoose.Schema({
   answers: [{
     _id: { type: mongoose.Schema.Types.ObjectId },
     text: { type: String },
-    name: { type: String, required: true },
-    user_name: { type: String },
+    // name: { type: String, required: true },
+    // user_name: { type: String },
+    ownerName: {
+      type: String,
+      ref: 'user',
+      required: true,
+      select: 'name'
+    },
     approved: { type: Boolean, default: false },
     grade: { type: Number, min: 0, max: 10, default: null },
     upvotes: { type: Number, default: 0 },

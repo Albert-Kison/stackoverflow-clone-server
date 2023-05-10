@@ -297,9 +297,10 @@ const addAnswer = (req, res, next) => {
 
   Question.findByIdAndUpdate(
     questionId,
-    { $push: { answers: { _id: answerId, text, name: userName } } },
+    { $push: { answers: { _id: answerId, text, ownerName: userName } } },
     { new: true }
   )
+    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
     .then((updatedQuestion) => {
       res.status(200).send(updatedQuestion);
     })
