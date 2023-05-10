@@ -199,8 +199,14 @@ const createQuestion = (req, res, next) => {
   const image = req.file ? req.file.buffer : 'default-image.jpg';
 
   Question.create({ text, image, tags, owner: req.user._id })
-    // .populate('owner', 'name')
-    .then((question) => res.status(200).send(question))
+    .then((question) => {
+      Question.populate(question, { path: 'owner', select: 'name' }, (err, populatedQuestion) => {
+        if (err) {
+          return next(err);
+        }
+        res.status(200).send(populatedQuestion);
+      });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Wrong data transferred'));
@@ -404,8 +410,32 @@ const upvoteAnswer = (req, res, next) => {
       next(err);
     });
 };
+// const addComment = (req, res, next) => {
+//   const { text} = req.body;
+//   const questionId = req.params.questionId;
+//   const answerId = req.params.answerId;
+
+//   if (!text) {
+//     return res.status(400).send({ message: 'Text is required' });
+//   }
+
+//   Question.findOneAndUpdate(
+//     { _id: questionId, "answers._id": answerId },
+//     { $push: { "answers.$.comments": { text, user: req.user._id} } },
+//     { new: true }
+//   )
+//     .then((updatedQuestion) => {
+//       if (!updatedQuestion) {
+//         return res.status(404).json({ error: "Question not found" });
+//       }
+//       res.status(200).json(updatedQuestion);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
 const addComment = (req, res, next) => {
-  const { text} = req.body;
+  const { text } = req.body;
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
 
@@ -415,9 +445,10 @@ const addComment = (req, res, next) => {
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $push: { "answers.$.comments": { text, user: req.user._id} } },
+    { $push: { "answers.$.comments": { text, user: req.user._id, name: req.user.name } } },
     { new: true }
   )
+    .populate('answers.comments.user', 'name') // add this line to populate the user field with the user's name
     .then((updatedQuestion) => {
       if (!updatedQuestion) {
         return res.status(404).json({ error: "Question not found" });
