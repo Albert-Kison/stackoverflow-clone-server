@@ -26,11 +26,51 @@ const ObjectId = mongoose.Types.ObjectId;
 //       next(err);
 //     });
 // };
+// const getQuestion = (req, res, next) => {
+//   const questionId = req.params.id;
+
+//   Question.findById(questionId)
+//     .populate('owner', 'name email tags isExpert')
+//     .then((question) => {
+//       if (!question) {
+//         return res.status(404).send({ message: 'Question not found' });
+//       }
+
+//       res.send({
+//         _id: question._id,
+//         text: question.text,
+//         image: question.image,
+//         owner: {
+//           _id: question.owner._id,
+//           name: question.owner.name,
+//           email: question.owner.email,
+//           tags: question.owner.tags,
+//           isExpert: question.owner.isExpert,
+//         },
+//         tags: question.tags,
+//         answers: question.answers.map((answer) => ({
+//           _id: answer._id,
+//           text: answer.text,
+//           name: answer.name,
+//           user_name: answer.user_name,
+//           approved: answer.approved,
+//           grade: answer.grade,
+//           upvotes: answer.upvotes,
+//           comments: answer.comments,
+//           createdAt: answer.createdAt,
+//         })),
+//         answered: question.answered,
+//         createdAt: question.createdAt,
+//       });
+//     })
+//     .catch(next);
+// };
 const getQuestion = (req, res, next) => {
   const questionId = req.params.id;
 
   Question.findById(questionId)
     .populate('owner', 'name email tags isExpert')
+    .populate('answers.user', 'name')
     .then((question) => {
       if (!question) {
         return res.status(404).send({ message: 'Question not found' });
@@ -47,6 +87,7 @@ const getQuestion = (req, res, next) => {
           tags: question.owner.tags,
           isExpert: question.owner.isExpert,
         },
+        ownerName: question.owner.name,
         tags: question.tags,
         answers: question.answers.map((answer) => ({
           _id: answer._id,
@@ -58,6 +99,8 @@ const getQuestion = (req, res, next) => {
           upvotes: answer.upvotes,
           comments: answer.comments,
           createdAt: answer.createdAt,
+          user: answer.user,
+          userName: answer.user ? answer.user.name : null,
         })),
         answered: question.answered,
         createdAt: question.createdAt,
@@ -65,7 +108,6 @@ const getQuestion = (req, res, next) => {
     })
     .catch(next);
 };
-
 const searchQuestionByText = (req, res, next) => {
   const searchText = req.body.text;
 
