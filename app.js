@@ -69,20 +69,14 @@ app.post(
   login,
 );
 
-// app.get('/api/getQuestions',(req,res) => {
-//   Question.find({})
-//     .then((questions) => {
-//       res.status(200).send(questions);
-//     })
-// });
-
-app.use(auth);
 app.get('/api/getQuestions',(req,res) => {
   Question.find({})
     .then((questions) => {
       res.status(200).send(questions);
     })
 });
+
+app.use(auth);
 
 app.use('/api/users', routesUsers);
 
