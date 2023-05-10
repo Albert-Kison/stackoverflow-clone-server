@@ -1,6 +1,9 @@
 const router = require('express').Router();
 
 const { celebrate, Joi } = require('celebrate');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const { sampleUrl } = require('../config');
 
@@ -24,9 +27,10 @@ const {
 
 router.post(
   '/',
+  upload.single('image'),
   celebrate({
     body: Joi.object().keys({
-      link:Joi.string().pattern(sampleUrl).required(),
+      // link:Joi.string().pattern(sampleUrl).required(),
       text: Joi.string().min(20).max(1000),
       tags: Joi.array().items(Joi.string()),
     }),
@@ -64,12 +68,13 @@ router.get(
 );
 router.post(
   '/:id',
+  upload.single('image'),
   celebrate({
     params: Joi.object().keys({
       id: Joi.string().required(),
     }),
     body: Joi.object().keys({
-      link: Joi.string().pattern(sampleUrl).required(),
+      // link: Joi.string().pattern(sampleUrl).required(),
       text: Joi.string().min(20).max(1000),
       tags: Joi.array().items(Joi.string()),
     }),
