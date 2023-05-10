@@ -1,4 +1,8 @@
 const Question = require('../models/question');
+const User = require('../models/user');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const CastError = require('../errors/CastError');
 
@@ -22,40 +26,207 @@ const ObjectId = mongoose.Types.ObjectId;
 //       next(err);
 //     });
 // };
-const createQuestion = (req, res, next) => {
-  const { link, text, tags } = req.body;
-  Question.create({ link, text, tags, owner: req.user._id })
-    .then((question) => res.status(200).send(question))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new ValidationError('Wrong data transferred'));
-      }
-      next(err);
-    });
-};
-const editQuestion = (req, res, next) => {
-  const { link,text,tags} = req.body;
-  const questionId = req.params.id; 
-  Question.findByIdAndUpdate(
-    questionId,
-    { link,text,tags},
-    { new: true }
-  )
+const getQuestion = (req, res, next) => {
+  const questionId = req.params.id;
+
+  Question.findById(questionId)
+    .populate('owner', 'name email tags isExpert')
     .then((question) => {
       if (!question) {
-        throw new NotFoundError('Question not found');
+        return res.status(404).send({ message: 'Question not found' });
       }
-      res.status(200).send(question);
+
+      res.send({
+        _id: question._id,
+        text: question.text,
+        image: question.image,
+        owner: {
+          _id: question.owner._id,
+          name: question.owner.name,
+          email: question.owner.email,
+          tags: question.owner.tags,
+          isExpert: question.owner.isExpert,
+        },
+        tags: question.tags,
+        answers: question.answers.map((answer) => ({
+          _id: answer._id,
+          text: answer.text,
+          name: answer.name,
+          user_name: answer.user_name,
+          approved: answer.approved,
+          grade: answer.grade,
+          upvotes: answer.upvotes,
+          comments: answer.comments,
+          createdAt: answer.createdAt,
+        })),
+        answered: question.answered,
+        createdAt: question.createdAt,
+      });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Invalid question ID'));
-      } else if (err.name === 'ValidationError') {
-        next(new ValidationError('Invalid question data'));
-      } else {
+    .catch(next);
+};
+
+const searchQuestionByText = (req, res, next) => {
+  const searchText = req.query.text;
+
+  Question.find({ text: { $regex: searchText, $options: 'i' } })
+    .populate('owner', 'name email tags isExpert')
+    .then((questions) => {
+      res.send(questions.map((question) => ({
+        _id: question._id,
+        text: question.text,
+        image: question.image,
+        owner: {
+          _id: question.owner._id,
+          name: question.owner.name,
+          email: question.owner.email,
+          tags: question.owner.tags,
+          isExpert: question.owner.isExpert,
+        },
+        tags: question.tags,
+        answers: question.answers.map((answer) => ({
+          _id: answer._id,
+          text: answer.text,
+          name: answer.name,
+          user_name: answer.user_name,
+          approved: answer.approved,
+          grade: answer.grade,
+          upvotes: answer.upvotes,
+          comments: answer.comments,
+          createdAt: answer.createdAt,
+        })),
+        answered: question.answered,
+        createdAt: question.createdAt,
+      })));
+    })
+    .catch(next);
+};
+
+const searchQuestionByTags = (req, res, next) => {
+  const tags = req.query.tags;
+
+  Question.find({ tags: { $all: tags } })
+    .populate('owner', 'name email tags isExpert')
+    .then((questions) => {
+      res.send(questions.map((question) => ({
+        _id: question._id,
+        text: question.text,
+        image: question.image,
+        owner: {
+          _id: question.owner._id,
+          name: question.owner.name,
+          email: question.owner.email,
+          tags: question.owner.tags,
+          isExpert: question.owner.isExpert,
+        },
+        tags: question.tags,
+        answers: question.answers.map((answer) => ({
+          _id: answer._id,
+          text: answer.text,
+          name: answer.name,
+          user_name: answer.user_name,
+          approved: answer.approved,
+          grade: answer.grade,
+          upvotes: answer.upvotes,
+          comments: answer.comments,
+          createdAt: answer.createdAt,
+        })),
+        answered: question.answered,
+        createdAt: question.createdAt,
+      })));
+    })
+    .catch(next);
+};
+
+// const createQuestion = (req, res, next) => {
+//   const { text, image, tags } = req.body;
+//   Question.create({ text, image, tags, owner: req.user._id })
+//     .then((question) => res.status(200).send(question))
+//     .catch((err) => {
+//       if (err.name === 'ValidationError') {
+//         next(new ValidationError('Wrong data transferred'));
+//       }
+//       next(err);
+//     });
+// };
+// const editQuestion = (req, res, next) => {
+//   const { image,text,tags} = req.body;
+//   const questionId = req.params.id; 
+//   Question.findByIdAndUpdate(
+//     questionId,
+//     { image,text,tags},
+//     { new: true }
+//   )
+//     .then((question) => {
+//       if (!question) {
+//         throw new NotFoundError('Question not found');
+//       }
+//       res.status(200).send(question);
+//     })
+//     .catch((err) => {
+//       if (err.name === 'CastError') {
+//         next(new BadRequestError('Invalid question ID'));
+//       } else if (err.name === 'ValidationError') {
+//         next(new ValidationError('Invalid question data'));
+//       } else {
+//         next(err);
+//       }
+//     });
+// };
+const createQuestion = (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      return next(new Error('Error uploading image.'));
+    } else if (err) {
+      return next(err);
+    }
+  
+    const { text, tags } = req.body;
+    const image = req.file.buffer;
+  
+    Question.create({ text, image, tags, owner: req.user._id })
+      .then((question) => res.status(200).send(question))
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          next(new ValidationError('Wrong data transferred'));
+        }
         next(err);
-      }
-    });
+      });
+  });
+};
+
+const editQuestion = (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      return next(new Error('Error uploading image.'));
+    } else if (err) {
+      return next(err);
+    }
+  
+    const { text, tags } = req.body;
+    const image = req.file ? req.file.buffer : undefined;
+  
+    Question.findByIdAndUpdate(
+      req.params.id,
+      { text, tags, ...(image && { image }) },
+      { new: true }
+    )
+      .then((question) => {
+        if (!question) {
+          throw new NotFoundError('Question not found');
+        }
+        res.status(200).send(question);
+      })
+      .catch((err) => {
+        if (err.name === 'CastError') {
+          next(new BadRequestError('Invalid question ID'));
+        } else if (err.name === 'ValidationError') {
+          next(new ValidationError('Invalid question data'));
+        } else {
+          next(err);
+        }
+      });
+  });
 };
 const deleteQuestion = (req, res, next) => {
   Question.findById(req.params._id)
@@ -231,6 +402,9 @@ module.exports = {
   approveAnswer,
   upvoteAnswer,
   gradeAnswer,
-  addComment
+  addComment,
+  getQuestion,
+  searchQuestionByText,
+  searchQuestionByTags
 
 };

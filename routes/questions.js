@@ -14,7 +14,10 @@ const {
   approveAnswer,
   upvoteAnswer,
   gradeAnswer,
-  addComment
+  addComment,
+  getQuestion,
+  searchQuestionByText,
+  searchQuestionByTags
 
 } = require('../controllers/questions');
 
@@ -29,6 +32,35 @@ router.post(
     }),
   }),
   createQuestion,
+);
+router.get(
+  '/:id',
+  celebrate({
+    params: Joi.object().keys({
+      id: Joi.string().required(),
+    }),
+  }),
+  getQuestion
+);
+
+router.get(
+  '/',
+  celebrate({
+    query: Joi.object().keys({
+      text: Joi.string().required(),
+    }),
+  }),
+  searchQuestionByText
+);
+
+router.get(
+  '/tags',
+  celebrate({
+    query: Joi.object().keys({
+      tags: Joi.array().items(Joi.string().required()).min(1).required(),
+    }),
+  }),
+  searchQuestionByTags
 );
 router.post(
   '/:id',

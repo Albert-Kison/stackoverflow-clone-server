@@ -9,13 +9,17 @@ const questionSchema = new mongoose.Schema({
     minlength: 20,
     maxlength: 1000,
   },
-  link: {
-    type:String,
-    required:true,
-    validate: {
-      validator: (v) => sampleUrl.test(v),
-      message: 'Enter link in format "http://google/...."',
-    },
+  // link: {
+  //   type:String,
+  //   required:true,
+  //   validate: {
+  //     validator: (v) => sampleUrl.test(v),
+  //     message: 'Enter link in format "http://google/...."',
+  //   },
+  // },
+  image: {
+    type: String,
+    required: false,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,

@@ -42,8 +42,31 @@ const getUser = (req, res, next) => {
     });
 };
 
+// const postUser = (req, res, next) => {
+//   const {name, email, password} = req.body;
+//   User.findOne({ email })
+//     .then((user) => {
+//       if (user) {
+//         throw new ConflictError('User with this email is already registered!');
+//       }
+//       return bcrypt.hash(password, SALT_ROUND);
+//     })
+//     .then((hash) => User.create({
+//       name: req.body.name,
+//       email: req.body.email,
+//       password: hash,
+//     }))
+//     .then(() => res.status(201).send({ message: `user account ${email} was created!` }))
+//     .catch((err) => {
+//       if (err.name === 'ValidationError') {
+//         next(new ValidationError('Wrong data!'));
+//       }
+//       next(err);
+//     });
+// };
 const postUser = (req, res, next) => {
-  const {name, email, password} = req.body;
+  const { name, email, password, tags } = req.body;
+
   User.findOne({ email })
     .then((user) => {
       if (user) {
@@ -51,18 +74,26 @@ const postUser = (req, res, next) => {
       }
       return bcrypt.hash(password, SALT_ROUND);
     })
-    .then((hash) => User.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: hash,
-    }))
-    .then(() => res.status(201).send({ message: `user account ${email} was created!` }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new ValidationError('Wrong data!'));
-      }
-      next(err);
-    });
+    .then((hash) => {
+      const newUser = {
+        name: req.body.name,
+        email: req.body.email,
+        password: hash,
+        tags: req.body.tags || [],
+        isExpert: req.body.tags && req.body.tags.length > 0,
+      };
+      return User.create(newUser);
+    })
+    .then((user) => {
+      res.status(201).send({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        tags: user.tags,
+        isExpert: user.isExpert,
+      });
+    })
+    .catch(next);
 };
 const deleteUser = (req, res, next) => {
   User.findByIdAndDelete(req.params.userId)

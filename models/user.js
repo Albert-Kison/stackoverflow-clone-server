@@ -28,6 +28,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean, 
     default: false 
   },
+  tags: {
+    type: [String],
+  },
+  isExpert: {
+    type: Boolean,
+    default: false,
+  },
   password: {
     type: String,
     required: true,
