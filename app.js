@@ -92,7 +92,7 @@ const getQuestions = (req, res, next) => {
   Question.find({})
     .sort({createdAt:-1})
     .populate('owner', 'name email tags isExpert')
-    .populate('answers.ownerName', 'name tags')
+    .populate('answers.ownerName', 'name')
     .populate('answers.comments.user', 'name')
     .then((questions) => {
       res.status(200).send(
@@ -107,17 +107,12 @@ const getQuestions = (req, res, next) => {
             tags: question.owner.tags,
             isExpert: question.owner.isExpert,
           },
-          // ownerName: question.owner.name,
           tags: question.tags,
           answers: question.answers.map((answer) => ({
             _id: answer._id,
             text: answer.text,
             name: answer.name,
-            ownerName: {
-              _id:answer.ownerName_id,
-              name:answer.ownerName.name,
-              tags:answer.ownerName.tags
-            },
+            ownerName: answer.ownerName,
             user_name: answer.user_name,
             approved: answer.approved,
             grade: answer.grade,
