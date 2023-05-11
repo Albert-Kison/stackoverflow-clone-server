@@ -29,7 +29,7 @@ const questionSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'user',
       required: true,
-      select: 'name'
+      select: 'name tags'
     },
     approved: { type: Boolean, default: false },
     grade: { type: Number, min: 0, max: 10, default: null },
