@@ -502,7 +502,8 @@ const approveAnswer = (req, res, next) => {
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $set: { "answers.$.approved": true } }
+    { $set: { "answers.$.approved": true, answered: true }, $addToSet: { tags: { $each: updatedQuestion.answers.find(answer => answer._id.toString() === answerId).tags } } },
+    { new: true }
   )
     .populate("owner", "tags")
     .then((updatedQuestion) => {
@@ -515,27 +516,35 @@ const approveAnswer = (req, res, next) => {
         return res.status(404).json({ error: "Answer not found" });
       }
 
-      if (!updatedQuestion.owner || !updatedQuestion.owner.tags) {
-        return res.status(404).json({ error: "Owner tags not found" });
-      }
+      // Retrieve owner of answer
+      const ownerName = approvedAnswer.ownerName;
+      User.findOne({ _id: ownerName }).exec((err, owner) => {
+        if (err) {
+          return next(err);
+        }
+        if (!owner) {
+          return res.status(404).json({ error: "Owner not found" });
+        }
   
-      const expertTags = new Set(updatedQuestion.owner.tags);
-      if (approvedAnswer.tags) {
-        approvedAnswer.tags.forEach((tag) => expertTags.add(tag));
-      }
+        // Add question tags to owner tags
+        const ownerTags = new Set(owner.tags);
+        if (approvedAnswer.tags) {
+          approvedAnswer.tags.forEach((tag) => ownerTags.add(tag));
+        }
   
-      User.findByIdAndUpdate(
-        updatedQuestion.owner._id,
-        { tags: Array.from(expertTags) },
-        { new: true }
-      )
-        .populate("tags")
-        .then((updatedUser) => {
-          res.status(200).json(updatedQuestion);
-        })
-        .catch((err) => {
-          next(err);
-        });
+        User.findByIdAndUpdate(
+          owner._id,
+          { tags: Array.from(ownerTags) },
+          { new: true }
+        )
+          .populate("tags")
+          .then((updatedUser) => {
+            res.status(200).json(updatedQuestion);
+          })
+          .catch((err) => {
+            next(err);
+          });
+      });
     })
     .catch((err) => {
       next(err);
