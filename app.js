@@ -92,7 +92,7 @@ const getQuestions = (req, res, next) => {
   Question.find({})
     .sort({createdAt:-1})
     .populate('owner', 'name email tags isExpert')
-    .populate('answers.ownerName', 'name')
+    .populate('answers.ownerName', 'name tags')
     .populate('answers.comments.user', 'name')
     .then((questions) => {
       res.status(200).send(
