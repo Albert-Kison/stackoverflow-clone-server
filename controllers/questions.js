@@ -506,14 +506,14 @@ const approveAnswer = (req, res, next) => {
     { $set: { "answers.$.approved": true, answered: true }, $addToSet: { tags: { $each: updatedQuestion.answers.find(answer => answer._id.toString() === answerId).tags } } },
     { new: true }
   )
-    .populate("owner", "tags")
+    .populate("owner", "name tags")
     .then((question) => {
       updatedQuestion = question;
 
       if (!updatedQuestion) {
         return res.status(404).json({ error: "Question not found" });
       }
-  
+
       const approvedAnswer = updatedQuestion.answers.find(answer => answer._id.toString() === answerId);
       if (!approvedAnswer) {
         return res.status(404).json({ error: "Answer not found" });
@@ -528,13 +528,13 @@ const approveAnswer = (req, res, next) => {
         if (!owner) {
           return res.status(404).json({ error: "Owner not found" });
         }
-  
+
         // Add question tags to owner tags
         const ownerTags = new Set(owner.tags);
         if (approvedAnswer.tags) {
           approvedAnswer.tags.forEach((tag) => ownerTags.add(tag));
         }
-  
+
         User.findByIdAndUpdate(
           owner._id,
           { tags: Array.from(ownerTags) },
