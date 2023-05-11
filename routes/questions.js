@@ -31,7 +31,7 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       // link:Joi.string().pattern(sampleUrl).required(),
-      text: Joi.string().min(20).max(1000),
+      text: Joi.string().min(1).max(1000),
       tags: Joi.array().items(Joi.string()),
     }),
   }),
@@ -48,7 +48,7 @@ router.get(
 );
 
 router.post(
-  '/',
+  '/text',
   celebrate({
     body: Joi.object().keys({
       text: Joi.string().min(1).max(1000).required(),
