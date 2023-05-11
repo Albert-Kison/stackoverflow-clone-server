@@ -524,7 +524,7 @@ const editAnswer = (req, res, next) => {
     { $set: { "answers.$.text": text, "answers.$.ownerName": req.user._id } },
     { new: true }
   )
-    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
+    .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
     .then((updatedQuestion) => {
       if (!updatedQuestion) {
         return res.status(404).json({ error: "Question not found" });
