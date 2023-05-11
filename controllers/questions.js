@@ -477,6 +477,25 @@ const removeAnswer = (req, res, next) => {
       next(err);
     });
 };
+// const approveAnswer = (req, res, next) => {
+//   const questionId = req.params.questionId;
+//   const answerId = req.params.answerId;
+
+//   Question.findOneAndUpdate(
+//     { _id: questionId, "answers._id": answerId },
+//     { $set: { "answers.$.approved": true }, answered: true },
+//     { new: true }
+//   )
+//     .then((updatedQuestion) => {
+//       if (!updatedQuestion) {
+//         return res.status(404).json({ error: "Question not found" });
+//       }
+//       res.status(200).json(updatedQuestion);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
 const approveAnswer = (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
@@ -486,11 +505,30 @@ const approveAnswer = (req, res, next) => {
     { $set: { "answers.$.approved": true }, answered: true },
     { new: true }
   )
+    .populate("owner", "tags")
     .then((updatedQuestion) => {
       if (!updatedQuestion) {
         return res.status(404).json({ error: "Question not found" });
       }
-      res.status(200).json(updatedQuestion);
+
+      const expertTags = new Set(updatedQuestion.owner.tags);
+      updatedQuestion.answers.forEach((answer) => {
+        if (answer._id.toString() === answerId) {
+          answer.tags.forEach((tag) => expertTags.add(tag));
+        }
+      });
+
+      User.findByIdAndUpdate(
+        updatedQuestion.owner._id,
+        { tags: Array.from(expertTags) },
+        { new: true }
+      )
+        .then((updatedUser) => {
+          res.status(200).json(updatedQuestion);
+        })
+        .catch((err) => {
+          next(err);
+        });
     })
     .catch((err) => {
       next(err);
