@@ -70,7 +70,8 @@ const getQuestion = (req, res, next) => {
 
   Question.findById(questionId)
     .populate('owner', 'name email tags isExpert')
-    .populate('answers.user', 'name')
+    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
+    .populate('answers.comments.user', 'name') // add this line to populate the user field with the user's name
     .then((question) => {
       if (!question) {
         return res.status(404).send({ message: 'Question not found' });
