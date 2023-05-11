@@ -466,7 +466,7 @@ const addAnswer = (req, res, next) => {
     { $push: { answers: { _id: answerId, text, ownerName: req.user._id } } },
     { new: true }
   )
-    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
+    .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
     .then((updatedQuestion) => {
       res.status(200).send(updatedQuestion);
     })
