@@ -70,7 +70,7 @@ const getQuestion = (req, res, next) => {
 
   Question.findById(questionId)
     .populate('owner', 'name email tags isExpert')
-    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
+    .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
     .populate('answers.comments.user', 'name') // add this line to populate the user field with the user's name
     .then((question) => {
       if (!question) {
@@ -186,7 +186,7 @@ const searchQuestionByText = (req, res, next) => {
 
   Question.find({ text: { $regex: searchText, $options: 'i' } })
     .populate('owner', 'name email tags isExpert')
-    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
+    .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
     .populate('answers.comments.user', 'name') // add this line to populate the user field with the user's name
     .then((questions) => {
       res.send(questions.map((question) => ({
@@ -228,7 +228,7 @@ const searchQuestionByTags = (req, res, next) => {
 
   Question.find({ tags: { $all: tags } })
     .populate('owner', 'name email tags isExpert')
-    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
+    .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
     .populate('answers.comments.user', 'name') // add this line to populate the user field with the user's name
     .then((questions) => {
       res.send(questions.map((question) => ({
