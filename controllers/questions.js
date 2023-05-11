@@ -339,6 +339,39 @@ const createQuestion = (req, res, next) => {
     });
 };
 
+// const editQuestion = (req, res, next) => {
+//   upload.single('image')(req, res, (err) => {
+//     if (err instanceof multer.MulterError) {
+//       return next(new Error('Error uploading image.'));
+//     } else if (err) {
+//       return next(err);
+//     }
+  
+//     const { text, tags } = req.body;
+//     const image = req.file ? req.file.buffer : 'default-image.jpg';
+  
+//     Question.findByIdAndUpdate(
+//       req.params.id,
+//       { text, tags, ...(image && { image }) },
+//       { new: true }
+//     )
+//       .then((question) => {
+//         if (!question) {
+//           throw new NotFoundError('Question not found');
+//         }
+//         res.status(200).send(question);
+//       })
+//       .catch((err) => {
+//         if (err.name === 'CastError') {
+//           next(new BadRequestError('Invalid question ID'));
+//         } else if (err.name === 'ValidationError') {
+//           next(new ValidationError('Invalid question data'));
+//         } else {
+//           next(err);
+//         }
+//       });
+//   });
+// };
 const editQuestion = (req, res, next) => {
   upload.single('image')(req, res, (err) => {
     if (err instanceof multer.MulterError) {
@@ -352,9 +385,10 @@ const editQuestion = (req, res, next) => {
   
     Question.findByIdAndUpdate(
       req.params.id,
-      { text, tags, ...(image && { image }) },
+      { text, tags, ...(image && { image }), owner: req.user._id },
       { new: true }
     )
+      .populate('owner', 'name')
       .then((question) => {
         if (!question) {
           throw new NotFoundError('Question not found');
