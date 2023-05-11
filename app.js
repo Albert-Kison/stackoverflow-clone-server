@@ -113,7 +113,11 @@ const getQuestions = (req, res, next) => {
             _id: answer._id,
             text: answer.text,
             name: answer.name,
-            ownerName: answer.ownerName,
+            ownerName: {
+              _id:answer.ownerName_id,
+              name:answer.ownerName.name,
+              tags:answer.ownerName.tags
+            },
             user_name: answer.user_name,
             approved: answer.approved,
             grade: answer.grade,
