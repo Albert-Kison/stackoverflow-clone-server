@@ -457,6 +457,26 @@ const addAnswer = (req, res, next) => {
 //       next(err);
 //     });
 // };
+// const editAnswer = (req, res, next) => {
+//   const questionId = req.params.questionId;
+//   const answerId = req.params.answerId;
+//   const { text } = req.body;
+
+//   Question.findOneAndUpdate(
+//     { _id: questionId, "answers._id": answerId },
+//     { $set: { "answers.$.text": text } },
+//     { new: true }
+//   )
+//     .then((updatedQuestion) => {
+//       if (!updatedQuestion) {
+//         return res.status(404).json({ error: "Question not found" });
+//       }
+//       res.status(200).json(updatedQuestion);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
 const editAnswer = (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
@@ -464,9 +484,10 @@ const editAnswer = (req, res, next) => {
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $set: { "answers.$.text": text } },
+    { $set: { "answers.$.text": text, "answers.$.ownerName": req.user._id } },
     { new: true }
   )
+    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
     .then((updatedQuestion) => {
       if (!updatedQuestion) {
         return res.status(404).json({ error: "Question not found" });
