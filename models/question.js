@@ -9,14 +9,6 @@ const questionSchema = new mongoose.Schema({
     minlength: 1,
     maxlength: 1000,
   },
-  // link: {
-  //   type:String,
-  //   required:true,
-  //   validate: {
-  //     validator: (v) => sampleUrl.test(v),
-  //     message: 'Enter link in format "http://google/...."',
-  //   },
-  // },
   image: {
     type: String,
     required: false,
@@ -33,8 +25,6 @@ const questionSchema = new mongoose.Schema({
   answers: [{
     _id: { type: mongoose.Schema.Types.ObjectId },
     text: { type: String },
-    // name: { type: String, required: true },
-    // user_name: { type: String },
     ownerName: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'user',

@@ -499,7 +499,6 @@ const removeAnswer = (req, res, next) => {
 const approveAnswer = (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
-  let updatedQuestion;
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
@@ -508,7 +507,7 @@ const approveAnswer = (req, res, next) => {
   )
     .populate("owner", "name tags")
     .then((question) => {
-      updatedQuestion = question;
+      let updatedQuestion = question;
 
       if (!updatedQuestion) {
         return res.status(404).json({ error: "Question not found" });
