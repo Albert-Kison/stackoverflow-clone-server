@@ -500,25 +500,38 @@ const approveAnswer = (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
 
+  console.log(`questionId: ${questionId}, answerId: ${answerId}`);
+
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $set: { "answers.$.approved": true, answered: true }, $addToSet: { tags: { $each: question.answers.find(answer => answer._id.toString() === answerId).tags } } },
+    { $set: { "answers.$.approved": true, answered: true }, 
+    $addToSet: 
+    { tags: 
+      { $each: question.answers.find(answer => answer._id.toString() === answerId).tags } } },
     { new: true }
   )
     .populate("owner", "name tags")
     .then((question) => {
+      console.log(question);
+
       if (!question) {
         return res.status(404).json({ error: "Question not found" });
       }
 
       const approvedAnswer = question.answers.find(answer => answer._id.toString() === answerId);
+      console.log(approvedAnswer);
+
       if (!approvedAnswer) {
         return res.status(404).json({ error: "Answer not found" });
       }
 
       // Retrieve owner of answer
       const ownerName = approvedAnswer.ownerName;
+      console.log(`ownerName: ${ownerName}`);
+
       User.findOne({ _id: ownerName }).exec((err, owner) => {
+        console.log(owner);
+
         if (err) {
           return next(err);
         }
@@ -539,6 +552,8 @@ const approveAnswer = (req, res, next) => {
         )
           .populate("tags")
           .then((updatedUser) => {
+            console.log(updatedUser);
+
             res.status(200).json(question);
           })
           .catch((err) => {
@@ -547,6 +562,8 @@ const approveAnswer = (req, res, next) => {
       });
     })
     .catch((err) => {
+      console.log(err);
+
       next(err);
     });
 };
