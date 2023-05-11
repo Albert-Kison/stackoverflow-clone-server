@@ -109,11 +109,84 @@ const getQuestion = (req, res, next) => {
     })
     .catch(next);
 };
+// const searchQuestionByText = (req, res, next) => {
+//   const searchText = req.body.text;
+
+//   Question.find({ text: { $regex: searchText, $options: 'i' } })
+//     .populate('owner', 'name email tags isExpert')
+//     .then((questions) => {
+//       res.send(questions.map((question) => ({
+//         _id: question._id,
+//         text: question.text,
+//         image: question.image,
+//         owner: {
+//           _id: question.owner._id,
+//           name: question.owner.name,
+//           email: question.owner.email,
+//           tags: question.owner.tags,
+//           isExpert: question.owner.isExpert,
+//         },
+//         tags: question.tags,
+//         answers: question.answers.map((answer) => ({
+//           _id: answer._id,
+//           text: answer.text,
+//           name: answer.name,
+//           user_name: answer.user_name,
+//           approved: answer.approved,
+//           grade: answer.grade,
+//           upvotes: answer.upvotes,
+//           comments: answer.comments,
+//           createdAt: answer.createdAt,
+//         })),
+//         answered: question.answered,
+//         createdAt: question.createdAt,
+//       })));
+//     })
+//     .catch(next);
+// };
+
+// const searchQuestionByTags = (req, res, next) => {
+//   const tags = req.body.tags;
+
+//   Question.find({ tags: { $all: tags } })
+//     .populate('owner', 'name email tags isExpert')
+//     .then((questions) => {
+//       res.send(questions.map((question) => ({
+//         _id: question._id,
+//         text: question.text,
+//         image: question.image,
+//         owner: {
+//           _id: question.owner._id,
+//           name: question.owner.name,
+//           email: question.owner.email,
+//           tags: question.owner.tags,
+//           isExpert: question.owner.isExpert,
+//         },
+//         tags: question.tags,
+//         answers: question.answers.map((answer) => ({
+//           _id: answer._id,
+//           text: answer.text,
+//           name: answer.name,
+//           user_name: answer.user_name,
+//           approved: answer.approved,
+//           grade: answer.grade,
+//           upvotes: answer.upvotes,
+//           comments: answer.comments,
+//           createdAt: answer.createdAt,
+//         })),
+//         answered: question.answered,
+//         createdAt: question.createdAt,
+//       })));
+//     })
+//     .catch(next);
+// };
 const searchQuestionByText = (req, res, next) => {
   const searchText = req.body.text;
 
   Question.find({ text: { $regex: searchText, $options: 'i' } })
     .populate('owner', 'name email tags isExpert')
+    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
+    .populate('answers.comments.user', 'name') // add this line to populate the user field with the user's name
     .then((questions) => {
       res.send(questions.map((question) => ({
         _id: question._id,
@@ -126,6 +199,7 @@ const searchQuestionByText = (req, res, next) => {
           tags: question.owner.tags,
           isExpert: question.owner.isExpert,
         },
+        ownerName: question.owner.name,
         tags: question.tags,
         answers: question.answers.map((answer) => ({
           _id: answer._id,
@@ -137,6 +211,8 @@ const searchQuestionByText = (req, res, next) => {
           upvotes: answer.upvotes,
           comments: answer.comments,
           createdAt: answer.createdAt,
+          user: answer.user,
+          userName: answer.user ? answer.user.name : null,
         })),
         answered: question.answered,
         createdAt: question.createdAt,
@@ -150,6 +226,8 @@ const searchQuestionByTags = (req, res, next) => {
 
   Question.find({ tags: { $all: tags } })
     .populate('owner', 'name email tags isExpert')
+    .populate('answers.ownerName', 'name') // add this line to populate the ownerName field with the user's name
+    .populate('answers.comments.user', 'name') // add this line to populate the user field with the user's name
     .then((questions) => {
       res.send(questions.map((question) => ({
         _id: question._id,
@@ -162,6 +240,7 @@ const searchQuestionByTags = (req, res, next) => {
           tags: question.owner.tags,
           isExpert: question.owner.isExpert,
         },
+        ownerName: question.owner.name,
         tags: question.tags,
         answers: question.answers.map((answer) => ({
           _id: answer._id,
@@ -173,6 +252,8 @@ const searchQuestionByTags = (req, res, next) => {
           upvotes: answer.upvotes,
           comments: answer.comments,
           createdAt: answer.createdAt,
+          user: answer.user,
+          userName: answer.user ? answer.user.name : null,
         })),
         answered: question.answered,
         createdAt: question.createdAt,
