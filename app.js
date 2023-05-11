@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 const routesUsers = require('./routes/users');
 
 const routesQuestions = require('./routes/questions');
-
+const routesSearch = equire('./routes/search');
 const { postUser, login } = require('./controllers/users');
 
 const { requestLogger, errorLogger } = require('./midlewares/Logger');
@@ -82,12 +82,55 @@ app.post(
   login,
 );
 
-app.get('/api/getQuestions',(req,res) => {
+// app.get('/api/getQuestions',(req,res) => {
+//   Question.find({})
+//     .then((questions) => {
+//       res.status(200).send(questions);
+//     })
+// });
+const getQuestions = (req, res, next) => {
   Question.find({})
+    .populate('owner', 'name email tags isExpert')
+    .populate('answers.ownerName', 'name')
+    .populate('answers.comments.user', 'name')
     .then((questions) => {
-      res.status(200).send(questions);
+      res.status(200).send(
+        questions.map((question) => ({
+          _id: question._id,
+          text: question.text,
+          image: question.image,
+          owner: {
+            _id: question.owner._id,
+            name: question.owner.name,
+            email: question.owner.email,
+            tags: question.owner.tags,
+            isExpert: question.owner.isExpert,
+          },
+          ownerName: question.owner.name,
+          tags: question.tags,
+          answers: question.answers.map((answer) => ({
+            _id: answer._id,
+            text: answer.text,
+            name: answer.name,
+            user_name: answer.user_name,
+            approved: answer.approved,
+            grade: answer.grade,
+            upvotes: answer.upvotes,
+            comments: answer.comments,
+            createdAt: answer.createdAt,
+            user: answer.user,
+            userName: answer.user ? answer.user.name : null,
+          })),
+          answered: question.answered,
+          createdAt: question.createdAt,
+        }))
+      );
     })
-});
+    .catch(next);
+};
+
+app.get('/api/getQuestions', getQuestions);
+app.use('/api/search',routesSearch)
 
 app.use(auth);
 
