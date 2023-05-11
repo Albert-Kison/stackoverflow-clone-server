@@ -502,18 +502,16 @@ const approveAnswer = (req, res, next) => {
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $set: { "answers.$.approved": true, answered: true }, $addToSet: { tags: { $each: updatedQuestion.answers.find(answer => answer._id.toString() === answerId).tags } } },
+    { $set: { "answers.$.approved": true, answered: true }, $addToSet: { tags: { $each: question.answers.find(answer => answer._id.toString() === answerId).tags } } },
     { new: true }
   )
     .populate("owner", "name tags")
     .then((question) => {
-      let updatedQuestion = question;
-
-      if (!updatedQuestion) {
+      if (!question) {
         return res.status(404).json({ error: "Question not found" });
       }
 
-      const approvedAnswer = updatedQuestion.answers.find(answer => answer._id.toString() === answerId);
+      const approvedAnswer = question.answers.find(answer => answer._id.toString() === answerId);
       if (!approvedAnswer) {
         return res.status(404).json({ error: "Answer not found" });
       }
@@ -541,7 +539,7 @@ const approveAnswer = (req, res, next) => {
         )
           .populate("tags")
           .then((updatedUser) => {
-            res.status(200).json(updatedQuestion);
+            res.status(200).json(question);
           })
           .catch((err) => {
             next(err);
