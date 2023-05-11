@@ -477,96 +477,96 @@ const removeAnswer = (req, res, next) => {
       next(err);
     });
 };
-// const approveAnswer = (req, res, next) => {
-//   const questionId = req.params.questionId;
-//   const answerId = req.params.answerId;
-
-//   Question.findOneAndUpdate(
-//     { _id: questionId, "answers._id": answerId },
-//     { $set: { "answers.$.approved": true }, answered: true },
-//     { new: true }
-//   )
-//     .then((updatedQuestion) => {
-//       if (!updatedQuestion) {
-//         return res.status(404).json({ error: "Question not found" });
-//       }
-//       res.status(200).json(updatedQuestion);
-//     })
-//     .catch((err) => {
-//       next(err);
-//     });
-// };
 const approveAnswer = (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
 
-  console.log(`questionId: ${questionId}, answerId: ${answerId}`);
-
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $set: { "answers.$.approved": true, answered: true }, 
-    $addToSet: 
-    { tags: 
-      { $each: question.answers.find(answer => answer._id.toString() === answerId).tags } } },
+    { $set: { "answers.$.approved": true }, answered: true },
     { new: true }
   )
-    .populate("owner", "name tags")
-    .then((question) => {
-      console.log(question);
-
-      if (!question) {
+    .then((updatedQuestion) => {
+      if (!updatedQuestion) {
         return res.status(404).json({ error: "Question not found" });
       }
-
-      const approvedAnswer = question.answers.find(answer => answer._id.toString() === answerId);
-      console.log(approvedAnswer);
-
-      if (!approvedAnswer) {
-        return res.status(404).json({ error: "Answer not found" });
-      }
-
-      // Retrieve owner of answer
-      const ownerName = approvedAnswer.ownerName;
-      console.log(`ownerName: ${ownerName}`);
-
-      User.findOne({ _id: ownerName }).exec((err, owner) => {
-        console.log(owner);
-
-        if (err) {
-          return next(err);
-        }
-        if (!owner) {
-          return res.status(404).json({ error: "Owner not found" });
-        }
-
-        // Add question tags to owner tags
-        const ownerTags = new Set(owner.tags);
-        if (approvedAnswer.tags) {
-          approvedAnswer.tags.forEach((tag) => ownerTags.add(tag));
-        }
-
-        User.findByIdAndUpdate(
-          owner._id,
-          { tags: Array.from(ownerTags) },
-          { new: true }
-        )
-          .populate("tags")
-          .then((updatedUser) => {
-            console.log(updatedUser);
-
-            res.status(200).json(question);
-          })
-          .catch((err) => {
-            next(err);
-          });
-      });
+      res.status(200).json(updatedQuestion);
     })
     .catch((err) => {
-      console.log(err);
-
       next(err);
     });
 };
+// const approveAnswer = (req, res, next) => {
+//   const questionId = req.params.questionId;
+//   const answerId = req.params.answerId;
+
+//   console.log(`questionId: ${questionId}, answerId: ${answerId}`);
+
+//   Question.findOneAndUpdate(
+//     { _id: questionId, "answers._id": answerId },
+//     { $set: { "answers.$.approved": true, answered: true }, 
+//     $addToSet: 
+//     { tags: 
+//       { $each: question.answers.find(answer => answer._id.toString() === answerId).tags } } },
+//     { new: true }
+//   )
+//     .populate("owner", "name tags")
+//     .then((question) => {
+//       console.log(question);
+
+//       if (!question) {
+//         return res.status(404).json({ error: "Question not found" });
+//       }
+
+//       const approvedAnswer = question.answers.find(answer => answer._id.toString() === answerId);
+//       console.log(approvedAnswer);
+
+//       if (!approvedAnswer) {
+//         return res.status(404).json({ error: "Answer not found" });
+//       }
+
+//       // Retrieve owner of answer
+//       const ownerName = approvedAnswer.ownerName;
+//       console.log(`ownerName: ${ownerName}`);
+
+//       User.findOne({ _id: ownerName }).exec((err, owner) => {
+//         console.log(owner);
+
+//         if (err) {
+//           return next(err);
+//         }
+//         if (!owner) {
+//           return res.status(404).json({ error: "Owner not found" });
+//         }
+
+//         // Add question tags to owner tags
+//         const ownerTags = new Set(owner.tags);
+//         if (approvedAnswer.tags) {
+//           approvedAnswer.tags.forEach((tag) => ownerTags.add(tag));
+//         }
+
+//         User.findByIdAndUpdate(
+//           owner._id,
+//           { tags: Array.from(ownerTags) },
+//           { new: true }
+//         )
+//           .populate("tags")
+//           .then((updatedUser) => {
+//             console.log(updatedUser);
+
+//             res.status(200).json(question);
+//           })
+//           .catch((err) => {
+//             next(err);
+//           });
+//       });
+//     })
+//     .catch((err) => {
+//       console.log(err);
+
+//       next(err);
+//     });
+// };
 const gradeAnswer = (req, res, next) => {
   const { grade } = req.body;
   const questionId = req.params.questionId;
