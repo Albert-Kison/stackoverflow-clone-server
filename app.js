@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 const routesUsers = require('./routes/users');
 
 const routesQuestions = require('./routes/questions');
-const routesSearch = equire('./routes/search');
+const routesSearch = require('./routes/search');
 const { postUser, login } = require('./controllers/users');
 
 const { requestLogger, errorLogger } = require('./midlewares/Logger');
