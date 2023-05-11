@@ -437,14 +437,34 @@ const addAnswer = (req, res, next) => {
       next(err);
     });
 };
+// const editAnswer = (req, res, next) => {
+//   const questionId = req.params.questionId;
+//   const answerId = req.params.answerId;
+//   const updatedAnswer = req.body;
+
+//   Question.findOneAndUpdate(
+//     { _id: questionId, "answers._id": answerId },
+//     { $set: { "answers.$": updatedAnswer } },
+//     { new: true }
+//   )
+//     .then((updatedQuestion) => {
+//       if (!updatedQuestion) {
+//         return res.status(404).json({ error: "Question not found" });
+//       }
+//       res.status(200).json(updatedQuestion);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
 const editAnswer = (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
-  const updatedAnswer = req.body;
+  const { text } = req.body;
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $set: { "answers.$": updatedAnswer } },
+    { $set: { "answers.$.text": text } },
     { new: true }
   )
     .then((updatedQuestion) => {
