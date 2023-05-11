@@ -502,22 +502,22 @@ const approveAnswer = (req, res, next) => {
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $set: { "answers.$.approved": true }, answered: true },
-    { new: true }
+    { $set: { "answers.$.approved": true } }
   )
     .populate("owner", "tags")
     .then((updatedQuestion) => {
       if (!updatedQuestion) {
         return res.status(404).json({ error: "Question not found" });
       }
-
+  
+      const approvedAnswer = updatedQuestion.answers.find(answer => answer._id.toString() === answerId);
+      if (!approvedAnswer) {
+        return res.status(404).json({ error: "Answer not found" });
+      }
+  
       const expertTags = new Set(updatedQuestion.owner.tags);
-      updatedQuestion.answers.forEach((answer) => {
-        if (answer._id.toString() === answerId) {
-          answer.tags.forEach((tag) => expertTags.add(tag));
-        }
-      });
-
+      approvedAnswer.tags.forEach((tag) => expertTags.add(tag));
+  
       User.findByIdAndUpdate(
         updatedQuestion.owner._id,
         { tags: Array.from(expertTags) },
