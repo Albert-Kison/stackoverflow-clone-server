@@ -90,6 +90,7 @@ app.post(
 // });
 const getQuestions = (req, res, next) => {
   Question.find({})
+    .sort({createdAt:-1})
     .populate('owner', 'name email tags isExpert')
     .populate('answers.ownerName', 'name')
     .populate('answers.comments.user', 'name')
