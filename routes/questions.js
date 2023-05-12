@@ -38,13 +38,14 @@ const {
 
 router.post(
   '/',
-  upload.single('image'),
+  // upload.single('image'),
   celebrate({
     body: Joi.object().keys({
       // link:Joi.string().pattern(sampleUrl).required(),
       questionName: Joi.string().min(1).max(100).required(),
       text: Joi.string().min(1).max(1000),
       tags: Joi.array().items(Joi.string()),
+      link:Joi.string().pattern(sampleUrl).required(),
     }),
   }),
   createQuestion,

@@ -325,10 +325,9 @@ const searchQuestionByTags = (req, res, next) => {
 //   });
 // };
 const createQuestion = (req, res, next) => {
-  const { text, tags,questionName} = req.body;
-  const image = req.file ? req.file.buffer : null;
-
-  Question.create({ questionName,text, image, tags, owner: req.user._id })
+  const { link,text, tags,questionName} = req.body;
+  //const image = req.file ? req.file.buffer : null;
+  Question.create({ link,questionName,text, tags, owner: req.user._id })
     .then((question) => {
       Question.populate(question, { path: 'owner', select: 'name' }, (err, populatedQuestion) => {
         if (err) {

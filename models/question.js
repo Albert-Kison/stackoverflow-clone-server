@@ -19,9 +19,17 @@ const questionSchema = new mongoose.Schema({
   //   type: String,
   //   required: false,
   // },
-  image: {
-    type: Buffer,
-    required: false,
+  // image: {
+  //   type: Buffer,
+  //   required: false,
+  // },
+  link: {
+    type:String,
+    required:true,
+    validate: {
+      validator: (v) => sampleUrl.test(v),
+      message: 'Enter link in format "http://google/...."',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
