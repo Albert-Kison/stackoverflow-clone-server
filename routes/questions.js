@@ -1,20 +1,19 @@
 const router = require('express').Router();
 
 const { celebrate, Joi } = require('celebrate');
-// const multer = require('multer');
-const fileUpload = require('express-fileupload');
+const multer = require('multer');
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
-// const path = require('path');
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, path.join(__dirname, '..', 'uploads')); // Specify the absolute path to store the uploaded files
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, Date.now() + '-' + file.originalname); // Generate a unique filename for the uploaded file
-//   }
-// });
-// const upload = multer({ storage: storage });
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '..', 'uploads')); // Specify the absolute path to store the uploaded files
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname); // Generate a unique filename for the uploaded file
+  }
+});
+const upload = multer({ storage: storage });
 
 
 const { sampleUrl } = require('../config');
@@ -36,15 +35,10 @@ const {
 
 } = require('../controllers/questions');
 
-router.use(fileUpload({
-  limits: { fileSize: 50 * 1024 * 1024 },
-  useTempFiles : true,
-  tempFileDir : '/tmp/'
-}));
+
 router.post(
   '/',
-  // upload.single('image'),
-  fileUpload.single('image'),
+  upload.single('image'),
   celebrate({
     body: Joi.object().keys({
       // link:Joi.string().pattern(sampleUrl).required(),
