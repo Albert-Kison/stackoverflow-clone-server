@@ -198,8 +198,13 @@ const login = (req, res, next) => {
         });
     })
     .then((user) => {
+      // const token = jwt.sign(
+      //   { _id: user._id },
+      //   JWT_SECRET,
+      //   { expiresIn: '7d' },
+      // );
       const token = jwt.sign(
-        { _id: user._id },
+        { _id: user._id, name: user.name, tags: user.tags, isExpert: user.isExpert },
         JWT_SECRET,
         { expiresIn: '7d' },
       );
