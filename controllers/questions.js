@@ -378,19 +378,20 @@ const createQuestion = (req, res, next) => {
 //   });
 // };
 const editQuestion = (req, res, next) => {
-  upload.single('image')(req, res, (err) => {
-    if (err instanceof multer.MulterError) {
-      return next(new Error('Error uploading image.'));
-    } else if (err) {
-      return next(err);
-    }
+  // upload.single('image')(req, res, (err) => {
+  //   if (err instanceof multer.MulterError) {
+  //     return next(new Error('Error uploading image.'));
+  //   } else if (err) {
+  //     return next(err);
+  //   }
   
-    const {questionName,text, tags } = req.body;
-    const image = req.file ? req.file.buffer : 'default-image.jpg';
+    const {link,questionName,text, tags } = req.body;
+    // const image = req.file ? req.file.buffer : 'default-image.jpg';
   
     Question.findByIdAndUpdate(
       req.params.id,
-      {questionName,text, tags, ...(image && { image }), owner: req.user._id },
+      // {questionName,text, tags, ...(image && { image }), owner: req.user._id },
+      {questionName,text, tags,link, owner: req.user._id },
       { new: true }
     )
       .populate('owner', 'name')
@@ -409,7 +410,6 @@ const editQuestion = (req, res, next) => {
           next(err);
         }
       });
-  });
 };
 const deleteQuestion = (req, res, next) => {
   Question.findById(req.params._id)

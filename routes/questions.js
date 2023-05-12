@@ -81,7 +81,7 @@ router.post(
 // );
 router.post(
   '/:id',
-  upload.single('image'),
+  // upload.single('image'),
   celebrate({
     params: Joi.object().keys({
       id: Joi.string().required(),
@@ -91,6 +91,7 @@ router.post(
       questionName: Joi.string().min(1).max(100).required(),
       text: Joi.string().min(20).max(1000),
       tags: Joi.array().items(Joi.string()),
+      link:Joi.string()
     }),
   }),
   editQuestion,
