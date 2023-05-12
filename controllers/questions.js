@@ -326,7 +326,7 @@ const searchQuestionByTags = (req, res, next) => {
 // };
 const createQuestion = (req, res, next) => {
   const { text, tags,questionName} = req.body;
-  const image = req.file ? req.file.buffer : 'default-image.jpg';
+  const image = req.file ? req.file.buffer : Buffer.alloc(0);
 
   Question.create({ questionName,text, image, tags, owner: req.user._id })
     .then((question) => {
