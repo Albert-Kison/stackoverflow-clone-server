@@ -28,7 +28,7 @@ const auth = (req, res, next) => {
   } catch (err) {
     next(new AuthError('Authorization required!'));
   }
-  req.user = payload;
+  // req.user = payload;
 
   next();
 };
