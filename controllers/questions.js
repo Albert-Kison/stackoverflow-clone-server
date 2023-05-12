@@ -192,6 +192,7 @@ const searchQuestionByText = (req, res, next) => {
     .then((questions) => {
       res.send(questions.map((question) => ({
         _id: question._id,
+        questionName: question.questionName,
         text: question.text,
         image: question.image,
         owner: {
@@ -234,6 +235,7 @@ const searchQuestionByTags = (req, res, next) => {
     .then((questions) => {
       res.send(questions.map((question) => ({
         _id: question._id,
+        questionName: question.questionName,
         text: question.text,
         image: question.image,
         owner: {
