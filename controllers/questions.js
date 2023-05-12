@@ -454,9 +454,9 @@ const deleteQuestion = (req, res, next) => {
 //     });
 // };
 const addAnswer = (req, res, next) => {
-  if (!req.user.isExpert) {
-    return res.status(401).send({ message: 'Unauthorized' });
-  }
+  // if (!req.user.isExpert) {
+  //   return res.status(401).send({ message: 'Unauthorized' });
+  // }
   const {link,text } = req.body;
 
   if (!text) {
