@@ -391,7 +391,7 @@ const editQuestion = (req, res, next) => {
     Question.findByIdAndUpdate(
       req.params.id,
       // {questionName,text, tags, ...(image && { image }), owner: req.user._id },
-      {questionName,text, tags,link, owner: req.user._id },
+      {questionName,text, tags,link },
       { new: true }
     )
       .populate('owner', 'name')
@@ -454,6 +454,9 @@ const deleteQuestion = (req, res, next) => {
 //     });
 // };
 const addAnswer = (req, res, next) => {
+  if (!req.user.isExpert) {
+    return res.status(401).send({ message: 'Unauthorized' });
+  }
   const {link,text } = req.body;
 
   if (!text) {
@@ -523,7 +526,8 @@ const editAnswer = (req, res, next) => {
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $set: { "answers.$.text": text, "answers.$.link": link,"answers.$.ownerName": req.user._id } },
+    // { $set: { "answers.$.text": text, "answers.$.link": link,"answers.$.ownerName": req.user._id } },
+    { $set: { "answers.$.text": text, "answers.$.link": link} },
     { new: true }
   )
     .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
@@ -576,20 +580,54 @@ const removeAnswer = (req, res, next) => {
 //       next(err);
 //     });
 // };
+// const approveAnswer = async (req, res, next) => {
+//   const questionId = req.params.questionId;
+//   const answerId = req.params.answerId;
+
+//   try {
+//     const updatedQuestion = await Question.findOneAndUpdate(
+//       { _id: questionId, "answers._id": answerId },
+//       { $set: { "answers.$.approved": true }, answered: true },
+//       { new: true }
+//     );
+
+//     if (!updatedQuestion) {
+//       return res.status(404).json({ error: "Question not found" });
+//     }
+
+//     const answer = updatedQuestion.answers.find(a => a._id.toString() === answerId);
+
+//     const answerOwner = await User.findById(answer.ownerName);
+
+//     if (answerOwner) {
+//       answerOwner.tags = [...new Set([...answerOwner.tags, ...updatedQuestion.tags])];
+//       await answerOwner.save();
+//     }
+
+//     res.status(200).json(updatedQuestion);
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 const approveAnswer = async (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
 
   try {
+    const question = await Question.findById(questionId);
+    if (!question) {
+      return res.status(404).json({ error: "Question not found" });
+    }
+
+    if (req.user._id.toString() !== question.owner.toString()) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
     const updatedQuestion = await Question.findOneAndUpdate(
       { _id: questionId, "answers._id": answerId },
       { $set: { "answers.$.approved": true }, answered: true },
       { new: true }
     );
-
-    if (!updatedQuestion) {
-      return res.status(404).json({ error: "Question not found" });
-    }
 
     const answer = updatedQuestion.answers.find(a => a._id.toString() === answerId);
 
