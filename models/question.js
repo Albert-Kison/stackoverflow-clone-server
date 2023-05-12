@@ -15,8 +15,12 @@ const questionSchema = new mongoose.Schema({
     minlength: 1,
     maxlength: 1000,
   },
+  // image: {
+  //   type: String,
+  //   required: false,
+  // },
   image: {
-    type: String,
+    type: Buffer,
     required: false,
   },
   owner: {
