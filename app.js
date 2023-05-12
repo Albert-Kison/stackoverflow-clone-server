@@ -98,6 +98,7 @@ const getQuestions = (req, res, next) => {
       res.status(200).send(
         questions.map((question) => ({
           _id: question._id,
+          questionName: question.questionName,
           text: question.text,
           image: question.image,
           owner: {

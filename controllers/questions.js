@@ -79,6 +79,7 @@ const getQuestion = (req, res, next) => {
 
       res.send({
         _id: question._id,
+        questionName: question.questionName,
         text: question.text,
         image: question.image,
         owner: {
