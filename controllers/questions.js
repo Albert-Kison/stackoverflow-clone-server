@@ -673,39 +673,26 @@ const removeAnswer = async (req, res, next) => {
     next(err);
   }
 };
-// const approveAnswer = (req, res, next) => {
-//   const questionId = req.params.questionId;
-//   const answerId = req.params.answerId;
 
-//   Question.findOneAndUpdate(
-//     { _id: questionId, "answers._id": answerId },
-//     { $set: { "answers.$.approved": true }, answered: true },
-//     { new: true }
-//   )
-//     .then((updatedQuestion) => {
-//       if (!updatedQuestion) {
-//         return res.status(404).json({ error: "Question not found" });
-//       }
-//       res.status(200).json(updatedQuestion);
-//     })
-//     .catch((err) => {
-//       next(err);
-//     });
-// };
 // const approveAnswer = async (req, res, next) => {
 //   const questionId = req.params.questionId;
 //   const answerId = req.params.answerId;
 
 //   try {
+//     const question = await Question.findById(questionId);
+//     if (!question) {
+//       return res.status(404).json({ error: "Question not found" });
+//     }
+
+//     if (req.user._id.toString() !== question.owner.toString()) {
+//       return res.status(403).json({ error: "Forbidden" });
+//     }
+
 //     const updatedQuestion = await Question.findOneAndUpdate(
 //       { _id: questionId, "answers._id": answerId },
 //       { $set: { "answers.$.approved": true }, answered: true },
 //       { new: true }
 //     );
-
-//     if (!updatedQuestion) {
-//       return res.status(404).json({ error: "Question not found" });
-//     }
 
 //     const answer = updatedQuestion.answers.find(a => a._id.toString() === answerId);
 
@@ -735,13 +722,20 @@ const approveAnswer = async (req, res, next) => {
       return res.status(403).json({ error: "Forbidden" });
     }
 
+    const answer = question.answers.find(a => a._id.toString() === answerId);
+    if (!answer) {
+      return res.status(404).json({ error: "Answer not found" });
+    }
+
+    if (answer.approved) {
+      return res.status(400).json({ error: "Answer already approved" });
+    }
+
     const updatedQuestion = await Question.findOneAndUpdate(
       { _id: questionId, "answers._id": answerId },
       { $set: { "answers.$.approved": true }, answered: true },
       { new: true }
     );
-
-    const answer = updatedQuestion.answers.find(a => a._id.toString() === answerId);
 
     const answerOwner = await User.findById(answer.ownerName);
 
