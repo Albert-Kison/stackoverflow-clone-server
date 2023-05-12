@@ -45,7 +45,7 @@ router.post(
       questionName: Joi.string().min(1).max(100).required(),
       text: Joi.string().min(1).max(1000),
       tags: Joi.array().items(Joi.string()),
-      link:Joi.string().pattern(sampleUrl).required(),
+      link:Joi.string()
     }),
   }),
   createQuestion,

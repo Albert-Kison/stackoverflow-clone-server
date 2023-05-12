@@ -25,11 +25,11 @@ const questionSchema = new mongoose.Schema({
   // },
   link: {
     type:String,
-    required:true,
-    validate: {
-      validator: (v) => sampleUrl.test(v),
-      message: 'Enter link in format "http://google/...."',
-    },
+    required:false,
+    // validate: {
+    //   validator: (v) => sampleUrl.test(v),
+    //   message: 'Enter link in format "http://google/...."',
+    // },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
