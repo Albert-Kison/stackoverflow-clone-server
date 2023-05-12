@@ -31,6 +31,7 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       // link:Joi.string().pattern(sampleUrl).required(),
+      questionName: Joi.string().min(1).max(100).required(),
       text: Joi.string().min(1).max(1000),
       tags: Joi.array().items(Joi.string()),
     }),
@@ -75,6 +76,7 @@ router.post(
     }),
     body: Joi.object().keys({
       // link: Joi.string().pattern(sampleUrl).required(),
+      questionName: Joi.string().min(1).max(100).required(),
       text: Joi.string().min(20).max(1000),
       tags: Joi.array().items(Joi.string()),
     }),

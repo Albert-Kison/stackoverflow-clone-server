@@ -322,10 +322,10 @@ const searchQuestionByTags = (req, res, next) => {
 //   });
 // };
 const createQuestion = (req, res, next) => {
-  const { text, tags } = req.body;
+  const { text, tags,questionName} = req.body;
   const image = req.file ? req.file.buffer : 'default-image.jpg';
 
-  Question.create({ text, image, tags, owner: req.user._id })
+  Question.create({ questionName,text, image, tags, owner: req.user._id })
     .then((question) => {
       Question.populate(question, { path: 'owner', select: 'name' }, (err, populatedQuestion) => {
         if (err) {
@@ -383,12 +383,12 @@ const editQuestion = (req, res, next) => {
       return next(err);
     }
   
-    const { text, tags } = req.body;
+    const {questionName,text, tags } = req.body;
     const image = req.file ? req.file.buffer : 'default-image.jpg';
   
     Question.findByIdAndUpdate(
       req.params.id,
-      { text, tags, ...(image && { image }), owner: req.user._id },
+      {questionName,text, tags, ...(image && { image }), owner: req.user._id },
       { new: true }
     )
       .populate('owner', 'name')

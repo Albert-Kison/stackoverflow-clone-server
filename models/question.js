@@ -3,6 +3,12 @@ const mongoose = require('mongoose');
 const { sampleUrl } = require('../config');
 
 const questionSchema = new mongoose.Schema({
+  questionName: {
+    type: String,
+    required: true,
+    minlength: 1,
+    maxlength: 100,
+  },
   text: {
     type: String,
     required: true,
