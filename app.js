@@ -99,7 +99,7 @@ const getQuestions = (req, res, next) => {
           _id: question._id,
           questionName: question.questionName,
           text: question.text,
-          image: question.image,
+          link: question.link,
           owner: {
             _id: question.owner._id,
             name: question.owner.name,
