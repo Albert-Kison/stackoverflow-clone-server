@@ -2,8 +2,18 @@ const router = require('express').Router();
 
 const { celebrate, Joi } = require('celebrate');
 const multer = require('multer');
-const storage = multer.memoryStorage();
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage: storage });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Specify the directory to store the uploaded files
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname); // Generate a unique filename for the uploaded file
+  }
+});
 const upload = multer({ storage: storage });
+
 
 const { sampleUrl } = require('../config');
 

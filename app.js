@@ -22,7 +22,6 @@ const { auth } = require('./midlewares/auth');
 const NotFoundError = require('./errors/NotFoundError');
 
 const app = express();
-
 // app.use(express.static('./dist'));
 
 app.use(cors());
