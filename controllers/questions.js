@@ -454,7 +454,7 @@ const deleteQuestion = (req, res, next) => {
 //     });
 // };
 const addAnswer = (req, res, next) => {
-  const { text } = req.body;
+  const {link,text } = req.body;
 
   if (!text) {
     return res.status(400).send({ message: 'Text is required' });
@@ -465,7 +465,7 @@ const addAnswer = (req, res, next) => {
 
   Question.findByIdAndUpdate(
     questionId,
-    { $push: { answers: { _id: answerId, text, ownerName: req.user._id } } },
+    { $push: { answers: { _id: answerId, text,link, ownerName: req.user._id } } },
     { new: true }
   )
     .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
@@ -519,11 +519,11 @@ const addAnswer = (req, res, next) => {
 const editAnswer = (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
-  const { text } = req.body;
+  const { text,link } = req.body;
 
   Question.findOneAndUpdate(
     { _id: questionId, "answers._id": answerId },
-    { $set: { "answers.$.text": text, "answers.$.ownerName": req.user._id } },
+    { $set: { "answers.$.text": text, "answers.$.link": link,"answers.$.ownerName": req.user._id } },
     { new: true }
   )
     .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
