@@ -56,6 +56,7 @@ const questionSchema = new mongoose.Schema({
     approved: { type: Boolean, default: false },
     grade: { type: Number, min: 0, max: 10, default: null },
     upvotes: { type: Number, default: 0 },
+    upvotedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
     comments: [{
       text: { type: String, required: true },
       user: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true,select: 'name'},
