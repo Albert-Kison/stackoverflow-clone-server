@@ -19,6 +19,12 @@ const auth = (req, res, next) => {
 
   try {
     payload = jwt.verify(token, JWT_SECRET);
+    req.user = {
+      _id: payload._id,
+      name: payload.name,
+      tags: payload.tags,
+      isExpert: payload.isExpert // add this line to include the isExpert field
+    };
   } catch (err) {
     next(new AuthError('Authorization required!'));
   }
