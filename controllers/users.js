@@ -204,7 +204,7 @@ const login = (req, res, next) => {
       //   { expiresIn: '7d' },
       // );
       const token = jwt.sign(
-        { _id: user._id, name: user.name, tags: user.tags, isExpert: user.isExpert },
+        { _id: user._id, name: user.name, tags: user.tags, isExpert: user.isExpert,isAdmin: user.isAdmin },
         JWT_SECRET,
         { expiresIn: '7d' },
       );

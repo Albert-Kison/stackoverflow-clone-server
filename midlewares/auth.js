@@ -23,7 +23,8 @@ const auth = (req, res, next) => {
       _id: payload._id,
       name: payload.name,
       tags: payload.tags,
-      isExpert: payload.isExpert // add this line to include the isExpert field
+      isExpert: payload.isExpert, // add this line to include the isExpert field
+      isAdmin: payload.isAdmin
     };
   } catch (err) {
     next(new AuthError('Authorization required!'));

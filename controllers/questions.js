@@ -377,58 +377,108 @@ const createQuestion = (req, res, next) => {
 //       });
 //   });
 // };
-const editQuestion = (req, res, next) => {
-  // upload.single('image')(req, res, (err) => {
-  //   if (err instanceof multer.MulterError) {
-  //     return next(new Error('Error uploading image.'));
-  //   } else if (err) {
-  //     return next(err);
-  //   }
+// const editQuestion = (req, res, next) => {
+//   // upload.single('image')(req, res, (err) => {
+//   //   if (err instanceof multer.MulterError) {
+//   //     return next(new Error('Error uploading image.'));
+//   //   } else if (err) {
+//   //     return next(err);
+//   //   }
   
-    const {link,questionName,text, tags } = req.body;
-    // const image = req.file ? req.file.buffer : 'default-image.jpg';
+//     const {link,questionName,text, tags } = req.body;
+//     // const image = req.file ? req.file.buffer : 'default-image.jpg';
   
-    Question.findByIdAndUpdate(
+//     Question.findByIdAndUpdate(
+//       req.params.id,
+//       // {questionName,text, tags, ...(image && { image }), owner: req.user._id },
+//       {questionName,text, tags,link },
+//       { new: true }
+//     )
+//       .populate('owner', 'name')
+//       .then((question) => {
+//         if (!question) {
+//           throw new NotFoundError('Question not found');
+//         }
+//         res.status(200).send(question);
+//       })
+//       .catch((err) => {
+//         if (err.name === 'CastError') {
+//           next(new BadRequestError('Invalid question ID'));
+//         } else if (err.name === 'ValidationError') {
+//           next(new ValidationError('Invalid question data'));
+//         } else {
+//           next(err);
+//         }
+//       });
+// };
+const editQuestion = async (req, res, next) => {
+  try {
+    const { link, questionName, text, tags } = req.body;
+    const question = await Question.findById(req.params.id);
+
+    if (!question) {
+      return res.status(404).json({ error: "Question not found" });
+    }
+
+    if (!req.user.isAdmin &&req.user._id.toString() !== question.owner.toString()) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const updatedQuestion = await Question.findByIdAndUpdate(
       req.params.id,
-      // {questionName,text, tags, ...(image && { image }), owner: req.user._id },
-      {questionName,text, tags,link },
+      { questionName, text, tags, link },
       { new: true }
-    )
-      .populate('owner', 'name')
-      .then((question) => {
-        if (!question) {
-          throw new NotFoundError('Question not found');
-        }
-        res.status(200).send(question);
-      })
-      .catch((err) => {
-        if (err.name === 'CastError') {
-          next(new BadRequestError('Invalid question ID'));
-        } else if (err.name === 'ValidationError') {
-          next(new ValidationError('Invalid question data'));
-        } else {
-          next(err);
-        }
-      });
+    ).populate('owner', 'name');
+
+    res.status(200).send(updatedQuestion);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return next(new BadRequestError('Invalid question ID'));
+    } else if (err.name === 'ValidationError') {
+      return next(new ValidationError('Invalid question data'));
+    }
+
+    next(err);
+  }
 };
-const deleteQuestion = (req, res, next) => {
-  Question.findById(req.params._id)
-    .orFail(() => {
+// const deleteQuestion = (req, res, next) => {
+//   Question.findById(req.params._id)
+//     .orFail(() => {
+//       throw new NotFoundError('No Question with this id!');
+//     })
+//     .then((question) => {
+//       Question.findByIdAndRemove(req.params._id)
+//           .then((data) => res
+//             .status(200)
+//             .send({ data, message: 'Question was deleted!' }))
+//           .catch(next);
+//     })
+//     .catch((err) => {
+//       if (err.name === 'CastError') {
+//         next(new CastError('Unvalid id of post'));
+//       }
+//       next(err);
+//     });
+// };
+const deleteQuestion = async (req, res, next) => {
+  try {
+    const question = await Question.findById(req.params._id).orFail(() => {
       throw new NotFoundError('No Question with this id!');
-    })
-    .then((question) => {
-      Question.findByIdAndRemove(req.params._id)
-          .then((data) => res
-            .status(200)
-            .send({ data, message: 'Question was deleted!' }))
-          .catch(next);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new CastError('Unvalid id of post'));
-      }
-      next(err);
     });
+
+    if (!req.user.isAdmin &&req.user._id.toString() !== question.owner.toString()) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const deletedQuestion = await Question.findByIdAndRemove(req.params._id);
+    res.status(200).json({ data: deletedQuestion, message: 'Question was deleted!' });
+  } catch (err) {
+    if (err.name === 'CastError') {
+      next(new CastError('Invalid id of post'));
+    } else {
+      next(err);
+    }
+  }
 };
 
 // const addAnswer = (req, res, next) => {
@@ -520,47 +570,108 @@ const addAnswer = (req, res, next) => {
 //       next(err);
 //     });
 // };
-const editAnswer = (req, res, next) => {
+// const editAnswer = (req, res, next) => {
+//   const questionId = req.params.questionId;
+//   const answerId = req.params.answerId;
+//   const { text,link } = req.body;
+
+//   Question.findOneAndUpdate(
+//     { _id: questionId, "answers._id": answerId },
+//     // { $set: { "answers.$.text": text, "answers.$.link": link,"answers.$.ownerName": req.user._id } },
+//     { $set: { "answers.$.text": text, "answers.$.link": link} },
+//     { new: true }
+//   )
+//     .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
+//     .then((updatedQuestion) => {
+//       if (!updatedQuestion) {
+//         return res.status(404).json({ error: "Question not found" });
+//       }
+//       res.status(200).json(updatedQuestion);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
+const editAnswer = async (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
-  const { text,link } = req.body;
+  const { text, link } = req.body;
 
-  Question.findOneAndUpdate(
-    { _id: questionId, "answers._id": answerId },
-    // { $set: { "answers.$.text": text, "answers.$.link": link,"answers.$.ownerName": req.user._id } },
-    { $set: { "answers.$.text": text, "answers.$.link": link} },
-    { new: true }
-  )
-    .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
-    .then((updatedQuestion) => {
-      if (!updatedQuestion) {
-        return res.status(404).json({ error: "Question not found" });
-      }
-      res.status(200).json(updatedQuestion);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  try {
+    const question = await Question.findById(questionId);
+    if (!question) {
+      return res.status(404).json({ error: "Question not found" });
+    }
+
+    const answer = question.answers.find(a => a._id.toString() === answerId);
+    if (!answer) {
+      return res.status(404).json({ error: "Answer not found" });
+    }
+
+    if (!req.user.isAdmin &&req.user._id.toString() !== answer.ownerName.toString()) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const updatedQuestion = await Question.findOneAndUpdate(
+      { _id: questionId, "answers._id": answerId },
+      { $set: { "answers.$.text": text, "answers.$.link": link } },
+      { new: true }
+    ).populate('answers.ownerName', 'name tags');
+
+    res.status(200).json(updatedQuestion);
+  } catch (err) {
+    next(err);
+  }
 };
 
-const removeAnswer = (req, res, next) => {
+// const removeAnswer = (req, res, next) => {
+//   const questionId = req.params.questionId;
+//   const answerId = req.params.answerId;
+
+//   Question.findByIdAndUpdate(
+//     questionId,
+//     { $pull: { answers: { _id: answerId } } },
+//     { new: true }
+//   )
+//     .then((updatedQuestion) => {
+//       if (!updatedQuestion) {
+//         return res.status(404).json({ error: "Question not found" });
+//       }
+//       res.status(200).json(updatedQuestion);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
+const removeAnswer = async (req, res, next) => {
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
 
-  Question.findByIdAndUpdate(
-    questionId,
-    { $pull: { answers: { _id: answerId } } },
-    { new: true }
-  )
-    .then((updatedQuestion) => {
-      if (!updatedQuestion) {
-        return res.status(404).json({ error: "Question not found" });
-      }
-      res.status(200).json(updatedQuestion);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  try {
+    const question = await Question.findById(questionId);
+    if (!question) {
+      return res.status(404).json({ error: "Question not found" });
+    }
+
+    const answer = question.answers.find(a => a._id.toString() === answerId);
+    if (!answer) {
+      return res.status(404).json({ error: "Answer not found" });
+    }
+
+    if (!req.user.isAdmin &&req.user._id.toString() !== answer.ownerName.toString()) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const updatedQuestion = await Question.findByIdAndUpdate(
+      questionId,
+      { $pull: { answers: { _id: answerId } } },
+      { new: true }
+    );
+
+    res.status(200).json(updatedQuestion);
+  } catch (err) {
+    next(err);
+  }
 };
 // const approveAnswer = (req, res, next) => {
 //   const questionId = req.params.questionId;
