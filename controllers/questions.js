@@ -721,7 +721,9 @@ const approveAnswer = async (req, res, next) => {
     if (req.user._id.toString() !== question.owner.toString()) {
       return res.status(403).json({ error: "Forbidden" });
     }
-
+    if (question.answered) {
+      return res.status(400).json({ error: "Question already answered" });
+    }
     const answer = question.answers.find(a => a._id.toString() === answerId);
     if (!answer) {
       return res.status(404).json({ error: "Answer not found" });
