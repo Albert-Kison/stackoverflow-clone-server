@@ -468,7 +468,8 @@ const addAnswer = (req, res, next) => {
 
   Question.findByIdAndUpdate(
     questionId,
-    { $push: { answers: { _id: answerId, text,link, ownerName: req.user._id } } },
+    // { $push: { answers: { _id: answerId, text,link, ownerName: req.user._id } } },
+    { $push: { answers: { _id: answerId, text,link } } },
     { new: true }
   )
     .populate('answers.ownerName', 'name tags') // add this line to populate the ownerName field with the user's name
