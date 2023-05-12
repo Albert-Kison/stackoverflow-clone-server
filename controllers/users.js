@@ -95,15 +95,41 @@ const postUser = (req, res, next) => {
     })
     .catch(next);
 };
-const deleteUser = (req, res, next) => {
-  User.findByIdAndDelete(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: 'User not found' });
-      }
-      res.status(200).send({ message: 'User deleted successfully' });
-    })
-    .catch(next);
+// const deleteUser = (req, res, next) => {
+//   User.findByIdAndDelete(req.params.userId)
+//     .then((user) => {
+//       if (!user) {
+//         return res.status(404).send({ message: 'User not found' });
+//       }
+//       res.status(200).send({ message: 'User deleted successfully' });
+//     })
+//     .catch(next);
+// };
+const deleteUser = async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Only allow admin or the user himself to delete the user
+    if (!req.user.isAdmin && req.user._id.toString() !== user._id.toString()) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).send({ message: 'User deleted successfully' });
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return next(new BadRequestError('Invalid user ID'));
+    }
+
+    next(err);
+  }
 };
 
 const getCurrentUser = (req, res, next) => {
@@ -120,19 +146,65 @@ const getCurrentUser = (req, res, next) => {
       next(err);
     });
 };
-const editUser = (req, res, next) => {
-  const { userId } = req.params;
-  const { name, email, isAdmin } = req.body;
+// const editUser = (req, res, next) => {
+//   const { userId } = req.params;
+//   const { name, email, isAdmin } = req.body;
 
-  User.findByIdAndUpdate(userId, { name, email, isAdmin })
-    .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'User not found' });
-      } else {
-        res.status(200).send(user);
-      }
-    })
-    .catch(next);
+//   User.findByIdAndUpdate(userId, { name, email, isAdmin })
+//     .then((user) => {
+//       if (!user) {
+//         res.status(404).send({ message: 'User not found' });
+//       } else {
+//         res.status(200).send(user);
+//       }
+//     })
+//     .catch(next);
+// };
+const editUser = async (req, res, next) => {
+  const { userId } = req.params;
+  const { name, email, password, tags } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Only allow admin or the user himself to edit the user's data
+    if (!req.user.isAdmin && req.user._id.toString() !== user._id.toString()) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // Update the user's data
+    user.name = name;
+    user.email = email;
+    user.tags = tags || [];
+    user.isExpert = tags && tags.length > 0;
+
+    if (password) {
+      user.password = await bcrypt.hash(password, SALT_ROUND);
+    }
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      tags: updatedUser.tags,
+      isExpert: updatedUser.isExpert,
+      isAdmin: updatedUser.isAdmin,
+    });
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return next(new BadRequestError('Invalid user ID'));
+    } else if (err.name === 'ValidationError') {
+      return next(new ValidationError('Invalid user data'));
+    }
+
+    next(err);
+  }
 };
 
 // const login = (req, res, next) => {

@@ -775,14 +775,43 @@ const gradeAnswer = (req, res, next) => {
       next(err);
     });
 };
+// const upvoteAnswer = (req, res, next) => {
+//   const questionId = req.params.questionId;
+//   const answerId = req.params.answerId;
+//   Question.findOneAndUpdate(
+//     { _id: questionId, "answers._id": answerId },
+//     { $inc: { "answers.$.upvotes": 1 } },
+//     { new: true }
+//   )
+//     .then((updatedQuestion) => {
+//       if (!updatedQuestion) {
+//         return res.status(404).json({ error: "Question not found Upvote" });
+//       }
+//       res.status(200).json(updatedQuestion);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
 const upvoteAnswer = (req, res, next) => {
+  const userId = req.user._id; // get the ID of the current user
   const questionId = req.params.questionId;
   const answerId = req.params.answerId;
-  Question.findOneAndUpdate(
-    { _id: questionId, "answers._id": answerId },
-    { $inc: { "answers.$.upvotes": 1 } },
-    { new: true }
-  )
+  
+  // check if the user has already upvoted the answer
+  Question.findOne({ _id: questionId, "answers._id": answerId, "answers.upvotedBy": userId })
+    .then((existingQuestion) => {
+      if (existingQuestion) {
+        return res.status(400).json({ error: "Answer has already been upvoted by this user" });
+      }
+      
+      // add the user ID to the array of upvotedBy in the answer and increment the upvotes count
+      return Question.findOneAndUpdate(
+        { _id: questionId, "answers._id": answerId },
+        { $addToSet: { "answers.$.upvotedBy": userId }, $inc: { "answers.$.upvotes": 1 } },
+        { new: true }
+      );
+    })
     .then((updatedQuestion) => {
       if (!updatedQuestion) {
         return res.status(404).json({ error: "Question not found Upvote" });
