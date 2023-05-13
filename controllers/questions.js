@@ -94,6 +94,7 @@ const getQuestion = (req, res, next) => {
         answers: question.answers.map((answer) => ({
           _id: answer._id,
           text: answer.text,
+          link:answer.link,
           name: answer.name,
           ownerName: answer.ownerName,
           user_name: answer.user_name,
@@ -207,6 +208,7 @@ const searchQuestionByText = (req, res, next) => {
         answers: question.answers.map((answer) => ({
           _id: answer._id,
           text: answer.text,
+          link:answer.link,
           name: answer.name,
           ownerName: answer.ownerName,
           user_name: answer.user_name,
@@ -250,6 +252,7 @@ const searchQuestionByTags = (req, res, next) => {
         answers: question.answers.map((answer) => ({
           _id: answer._id,
           text: answer.text,
+          link:answer.link,
           name: answer.name,
           ownerName: answer.ownerName,
           user_name: answer.user_name,
