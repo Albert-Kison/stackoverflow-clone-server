@@ -149,11 +149,12 @@ const deleteUser = async (req, res, next) => {
     // Delete user's question(s)
     await Question.deleteMany({ owner: user._id });
 
-    // Delete user's answer(s)
-    await Question.updateMany(
-      { "answers.ownerName": user._id },
-      { $pull: { answers: { ownerName: user._id } } }
-    );
+    // Delete user's answer(s), if any
+    const questions = await Question.find({ "answers.ownerName": user._id });
+    for (const question of questions) {
+      question.answers = question.answers.filter((answer) => answer.ownerName.toString() !== user._id.toString());
+      await question.save();
+    }
 
     // Delete user
     await User.findByIdAndDelete(userId);
