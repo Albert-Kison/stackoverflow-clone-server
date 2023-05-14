@@ -154,6 +154,9 @@ const deleteUser = async (req, res, next) => {
     const questions = await Question.find({ "answers.ownerName": user._id });
     for (const question of questions) {
       question.answers = question.answers.filter((answer) => answer.ownerName.toString() !== user._id.toString());
+      for (const answer of question.answers) {
+        answer.comments = answer.comments.filter((comment) => comment.user.toString() !== user._id.toString());
+      }
       await question.save();
     }
 
