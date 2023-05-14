@@ -105,6 +105,32 @@ const postUser = (req, res, next) => {
 //     })
 //     .catch(next);
 // };
+// const deleteUser = async (req, res, next) => {
+//   const { userId } = req.params;
+
+//   try {
+//     const user = await User.findById(userId);
+
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     // Only allow admin or the user himself to delete the user
+//     if (!req.user.isAdmin && req.user._id.toString() !== user._id.toString()) {
+//       return res.status(403).json({ error: "Forbidden" });
+//     }
+
+//     await User.findByIdAndDelete(userId);
+
+//     res.status(200).send({ message: 'User deleted successfully' });
+//   } catch (err) {
+//     if (err.name === 'CastError') {
+//       return next(new BadRequestError('Invalid user ID'));
+//     }
+
+//     next(err);
+//   }
+// };
 const deleteUser = async (req, res, next) => {
   const { userId } = req.params;
 
@@ -120,6 +146,16 @@ const deleteUser = async (req, res, next) => {
       return res.status(403).json({ error: "Forbidden" });
     }
 
+    // Delete user's question(s)
+    await Question.deleteMany({ owner: user._id });
+
+    // Delete user's answer(s)
+    await Question.updateMany(
+      { "answers.ownerName": user._id },
+      { $pull: { answers: { ownerName: user._id } } }
+    );
+
+    // Delete user
     await User.findByIdAndDelete(userId);
 
     res.status(200).send({ message: 'User deleted successfully' });
