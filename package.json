@@ -1,9 +1,10 @@
 {
-  "name": "server_assignment",
+  "name": "y",
   "version": "1.0.0",
   "description": "Node.js assignment",
   "main": "app.js",
   "scripts": {
+    "serve": "nodemon app.js",
     "start": "node app.js",
     "dev": "nodemon app.js",
     "lint": "npx eslint .",
@@ -11,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bigBug228/VideoGameSite_3030235.git"
+    "url": "git+https://github.com/bigBug228/VideoGameSite_3030235.git"
   },
   "keywords": [],
   "author": "Ivan Zhukov",
@@ -27,7 +28,7 @@
     "express-winston": "^4.2.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^5.1.0",
-    "mongoose": "^6.0.12",
+    "mongoose": "^8.4.1",
     "multer": "^1.4.5-lts.1",
     "path": "^0.12.7",
     "validator": "^13.7.0",
@@ -39,5 +40,9 @@
     "eslint-plugin-import": "^2.25.3",
     "jest": "^27.4.1",
     "nodemon": "^2.0.15"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/bigBug228/VideoGameSite_3030235/issues"
+  },
+  "homepage": "https://github.com/bigBug228/VideoGameSite_3030235#readme"
 }

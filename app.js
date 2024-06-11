@@ -10,6 +10,7 @@ const Question = require('./models/question');
 const bodyParser = require('body-parser');
 
 const routesUsers = require('./routes/users');
+console.log('File is executing');
 
 const routesQuestions = require('./routes/questions');
 const routesSearch = require('./routes/search');
@@ -160,9 +161,10 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(process.env.PORT || 8080, () => {
-  console.log(`App listening on port ${process.env.PORT}`);
-});
-// app.listen(3000, () => {
-//   console.log(`App listening on port 3000`);
+// app.listen(process.env.PORT || 8080, () => {
+//   console.log(`App listening on port ${process.env.PORT}`);
 // });
+
+app.listen(3000, () => {
+  console.log(`App listening on port 3000`);
+});
