@@ -5,6 +5,7 @@ const AuthError = require('../errors/AuthError');
 const { JWT_SECRET } = require('../config');
 
 const auth = (req, res, next) => {
+  console.log("in auth");
   const { authorization } = req.headers;
   let token;
   if (!authorization) {
@@ -31,6 +32,7 @@ const auth = (req, res, next) => {
   }
   // req.user = payload;
 
+  console.log("next middleware");
   next();
 };
 module.exports = { auth };
