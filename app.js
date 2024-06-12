@@ -25,7 +25,7 @@ const NotFoundError = require('./errors/NotFoundError');
 const app = express();
 // app.use(express.static('./dist'));
 
-// app.use(cors());
+app.use(cors());
 
 mongoose.connect(
   // process.env.MONGODB_URI,
